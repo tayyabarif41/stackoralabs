@@ -74,6 +74,7 @@ const platformOptions = [
 ];
 
 export default function Contact() {
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
@@ -87,7 +88,7 @@ export default function Contact() {
     message: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -129,7 +130,7 @@ export default function Contact() {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.name.trim() || formData.name.length < 2) {
       newErrors.name = 'Please enter your name';
     }
@@ -158,18 +159,36 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-  };
+    setSubmitError(null);
 
+    try {
+      const endpoint = import.meta.env.VITE_CONTACT_ENDPOINT || '/api/contact';
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || `Server error ${res.status}`);
+      }
+
+      setIsSubmitted(true);
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error
+          ? err.message
+          : 'Something went wrong. Please try again or email us directly.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -189,14 +208,14 @@ export default function Contact() {
               <span className="text-[var(--accent)]">Commerce Engine.</span>
             </h2>
             <p className="text-[14px] text-[var(--muted)] leading-relaxed mb-10">
-              Book a free 30-minute strategy session. We'll review your store, identify revenue 
+              Book a free 30-minute strategy session. We'll review your store, identify revenue
               opportunities and propose a scope — at no cost and no obligation.
             </p>
 
             {/* Contact Info */}
             <div className="space-y-0">
               {contactInfo.map((item, index) => (
-                <div 
+                <div
                   key={index}
                   className="py-5 border-b border-[var(--border)] first:border-t"
                 >
@@ -243,9 +262,8 @@ export default function Contact() {
                         value={formData.name}
                         onChange={(e) => handleChange('name', e.target.value)}
                         placeholder="Khalid Al-Rashid"
-                        className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted-2)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] ${
-                          errors.name ? 'border-red-400' : 'border-[var(--border)]'
-                        }`}
+                        className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted-2)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] ${errors.name ? 'border-red-400' : 'border-[var(--border)]'
+                          }`}
                       />
                       {errors.name && (
                         <span className="text-[10px] text-red-500 mt-1">{errors.name}</span>
@@ -260,9 +278,8 @@ export default function Contact() {
                         value={formData.email}
                         onChange={(e) => handleChange('email', e.target.value)}
                         placeholder="khalid@yourbrand.ae"
-                        className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted-2)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] ${
-                          errors.email ? 'border-red-400' : 'border-[var(--border)]'
-                        }`}
+                        className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted-2)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] ${errors.email ? 'border-red-400' : 'border-[var(--border)]'
+                          }`}
                       />
                       {errors.email && (
                         <span className="text-[10px] text-red-500 mt-1">{errors.email}</span>
@@ -281,9 +298,8 @@ export default function Contact() {
                         value={formData.company}
                         onChange={(e) => handleChange('company', e.target.value)}
                         placeholder="Your Brand LLC"
-                        className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted-2)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] ${
-                          errors.company ? 'border-red-400' : 'border-[var(--border)]'
-                        }`}
+                        className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted-2)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] ${errors.company ? 'border-red-400' : 'border-[var(--border)]'
+                          }`}
                       />
                       {errors.company && (
                         <span className="text-[10px] text-red-500 mt-1">{errors.company}</span>
@@ -296,9 +312,8 @@ export default function Contact() {
                       <select
                         value={formData.country}
                         onChange={(e) => handleChange('country', e.target.value)}
-                        className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] appearance-none cursor-pointer ${
-                          errors.country ? 'border-red-400' : 'border-[var(--border)]'
-                        }`}
+                        className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] appearance-none cursor-pointer ${errors.country ? 'border-red-400' : 'border-[var(--border)]'
+                          }`}
                         style={{
                           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237A7670' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
                           backgroundRepeat: 'no-repeat',
@@ -325,9 +340,8 @@ export default function Contact() {
                       <select
                         value={formData.service}
                         onChange={(e) => handleChange('service', e.target.value)}
-                        className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] appearance-none cursor-pointer ${
-                          errors.service ? 'border-red-400' : 'border-[var(--border)]'
-                        }`}
+                        className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] appearance-none cursor-pointer ${errors.service ? 'border-red-400' : 'border-[var(--border)]'
+                          }`}
                         style={{
                           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237A7670' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
                           backgroundRepeat: 'no-repeat',
@@ -350,9 +364,8 @@ export default function Contact() {
                       <select
                         value={formData.budget}
                         onChange={(e) => handleChange('budget', e.target.value)}
-                        className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] appearance-none cursor-pointer ${
-                          errors.budget ? 'border-red-400' : 'border-[var(--border)]'
-                        }`}
+                        className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] appearance-none cursor-pointer ${errors.budget ? 'border-red-400' : 'border-[var(--border)]'
+                          }`}
                         style={{
                           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237A7670' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
                           backgroundRepeat: 'no-repeat',
@@ -402,15 +415,19 @@ export default function Contact() {
                       onChange={(e) => handleChange('message', e.target.value)}
                       placeholder="Tell us about your brand, your current store, pain points and what success looks like…"
                       rows={4}
-                      className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted-2)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] resize-none ${
-                        errors.message ? 'border-red-400' : 'border-[var(--border)]'
-                      }`}
+                      className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted-2)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] resize-none ${errors.message ? 'border-red-400' : 'border-[var(--border)]'
+                        }`}
                     />
                     {errors.message && (
                       <span className="text-[10px] text-red-500 mt-1">{errors.message}</span>
                     )}
                   </div>
-
+                  {submitError && (
+                    <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-[12px] text-red-700">
+                      <span className="flex-shrink-0 mt-0.5">⚠</span>
+                      <span>{submitError}</span>
+                    </div>
+                  )}
                   {/* Submit */}
                   <button
                     type="submit"

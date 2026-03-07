@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, Sparkles, Play } from 'lucide-react';
+import { translations, useT } from '@/i18n/translation';
+import { useLanguage } from '@/context/LanguageContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,6 +15,9 @@ export default function Hero() {
   const actionsRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   const orbsRef = useRef<HTMLDivElement>(null);
+  const { lang } = useLanguage();
+  const t = useT(lang);
+  const tx = translations.hero;
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -196,7 +201,7 @@ export default function Hero() {
             <Sparkles className="w-3.5 h-3.5 text-white" />
           </div>
           <span className="text-[12px] font-medium text-[var(--muted)] tracking-wide">
-            Dubai's Premier Ecommerce Engineering Partner
+          {t(tx.heading1)} {t(tx.heading2)}
           </span>
           <span className="flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-[var(--accent)] opacity-75"></span>
