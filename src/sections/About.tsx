@@ -1,152 +1,116 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, TrendingUp } from 'lucide-react';
-
-gsap.registerPlugin(ScrollTrigger);
-
-const stats = [
-  { value: '180', suffix: '+', label: 'Ecommerce Projects' },
-  { value: '2.8', prefix: '$', suffix: 'B', label: 'Revenue Processed', decimals: 1 },
-  { value: '4', suffix: ' GCC', label: 'Markets Served' },
-  { value: '97', suffix: '%', label: 'Client Retention' },
-];
+import { ArrowRight } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
+import { translations, useT } from '@/i18n/translation';
 
 export default function About() {
+  const { lang } = useLanguage();
+  const t = useT(lang);
+  const tx = translations.about;
   const sectionRef = useRef<HTMLElement>(null);
-  const statsRef = useRef<HTMLDivElement>(null);
+
+  const stats = [
+    { value: 180, suffix: '+', label: t(tx.stat1_label), raw: t(tx.stat1_value) },
+    { value: 2.8, suffix: 'B', label: t(tx.stat2_label), raw: t(tx.stat2_value) },
+    { value: 4,   suffix: '',  label: t(tx.stat3_label), raw: t(tx.stat3_value) },
+    { value: 97,  suffix: '%', label: t(tx.stat4_label), raw: t(tx.stat4_value) },
+  ];
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Counter animation
-      const counters = document.querySelectorAll('.about-counter');
-      counters.forEach((counter) => {
-        const target = parseFloat(counter.getAttribute('data-target') || '0');
-        const decimals = parseInt(counter.getAttribute('data-decimals') || '0');
-        
+      gsap.fromTo('.about-stat',
+        { opacity: 0, y: 32, scale: 0.95 },
+        {
+          opacity: 1, y: 0, scale: 1,
+          duration: 0.6, stagger: 0.1, ease: 'power3.out',
+          scrollTrigger: { trigger: '.about-stats', start: 'top 80%', once: true },
+        }
+      );
+
+      const counters = document.querySelectorAll<HTMLElement>('.about-counter');
+      counters.forEach((el) => {
+        const target = parseFloat(el.dataset.target || '0');
+        const isDecimal = target % 1 !== 0;
+        const suffix = el.dataset.suffix || '';
+
         ScrollTrigger.create({
-          trigger: counter,
+          trigger: el,
           start: 'top 85%',
           once: true,
           onEnter: () => {
-            gsap.to({ value: 0 }, {
-              value: target,
-              duration: 2,
-              ease: 'power2.out',
-              onUpdate: function() {
-                const val = this.targets()[0].value;
-                counter.textContent = decimals > 0 ? val.toFixed(decimals) : Math.floor(val).toString();
-              },
-            });
+            gsap.to(
+              { val: 0 },
+              {
+                val: target,
+                duration: 2,
+                ease: 'power2.out',
+                onUpdate: function () {
+                  const v = this.targets()[0].val;
+                  el.textContent = isDecimal
+                    ? `$${v.toFixed(1)}B`
+                    : `${Math.round(v)}${suffix}`;
+                },
+              }
+            );
           },
         });
       });
-
-      // Stat boxes stagger
-      gsap.fromTo('.stat-box',
-        { opacity: 0, y: 30, scale: 0.95 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: statsRef.current,
-            start: 'top 80%',
-            once: true,
-          },
-        }
-      );
     }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
-  const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    const target = document.querySelector(href);
-    if (target) {
-      const offset = 80;
-      const targetPosition = target.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top: targetPosition, behavior: 'smooth' });
-    }
-  };
-
   return (
-    <section ref={sectionRef} id="about" className="section bg-[var(--bg)]">
+    <section ref={sectionRef} id="about" className="reveal-section section bg-[var(--bg-2)]">
       <div className="container">
-        <div className="grid lg:grid-cols-[1.2fr_1fr] gap-16 lg:gap-20 items-center">
-          {/* Left Content */}
-          <div className="reveal-section">
-            <div className="tag mb-6">Our Positioning</div>
-            
-            <h2 className="text-[clamp(42px,5vw,68px)] font-[var(--font-display)] font-semibold leading-[0.95] mb-6">
-              Not a Generic Agency.<br />
-              <span className="text-[var(--accent)]">A Specialist Partner.</span>
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+
+          {/* Left: text */}
+          <div>
+            <span className="tag mb-6">{t(tx.tag)}</span>
+            <h2 className="font-[var(--font-display)] text-[clamp(28px,4vw,52px)] font-bold text-[var(--ink)] leading-tight mb-6">
+              {t(tx.heading)}
             </h2>
-            
-            <p className="text-[15px] text-[var(--muted)] leading-relaxed max-w-[500px] mb-8">
-              Most GCC agencies offer ecommerce as one of twenty services. We offer it as our 
-              only one — which is why our clients convert better, launch faster, and scale 
-              further than anyone else in the region.
+            <p className="text-[var(--muted)] text-[16px] leading-relaxed mb-4">
+              {t(tx.body1)}
             </p>
-            
+            <p className="text-[var(--muted)] text-[16px] leading-relaxed mb-10">
+              {t(tx.body2)}
+            </p>
             <div className="flex flex-wrap gap-3">
-              <a
-                href="#services"
-                onClick={(e) => handleScrollTo(e, '#services')}
-                className="btn btn-primary"
-              >
-                Our Services
+              <a href="#services" className="btn btn-primary gap-2">
+                {t(tx.cta_services)}
                 <ArrowRight className="w-4 h-4" />
               </a>
-              <a
-                href="#cases"
-                onClick={(e) => handleScrollTo(e, '#cases')}
-                className="btn btn-secondary"
-              >
-                See Work
+              <a href="#cases" className="btn btn-secondary gap-2">
+                {t(tx.cta_work)}
               </a>
             </div>
           </div>
 
-          {/* Right Stats Grid */}
-          <div ref={statsRef} className="grid grid-cols-2 gap-4">
-            {stats.map((stat, index) => (
+          {/* Right: stats grid */}
+          <div className="about-stats grid grid-cols-2 gap-4">
+            {stats.map((stat, i) => (
               <div
-                key={index}
-                className={`stat-box bg-white border border-[var(--border)] rounded-xl p-6 lg:p-7 card-hover ${
-                  index === 1 ? 'lg:mt-6' : index === 3 ? 'lg:-mt-6' : ''
-                }`}
+                key={i}
+                className="about-stat bg-white rounded-2xl p-7 border border-[var(--border)] card-hover"
               >
-                <div className="flex items-start gap-1 mb-2">
-                  {stat.prefix && (
-                    <span className="font-[var(--font-display)] text-[clamp(28px,3vw,42px)] font-bold leading-none">
-                      {stat.prefix}
-                    </span>
-                  )}
-                  <span 
-                    className="about-counter font-[var(--font-display)] text-[clamp(28px,3vw,42px)] font-bold leading-none"
-                    data-target={stat.value}
-                    data-decimals={stat.decimals || 0}
-                  >
-                    0
-                  </span>
-                  <span className="font-[var(--font-display)] text-[clamp(28px,3vw,42px)] font-bold leading-none text-[var(--accent)]">
-                    {stat.suffix}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-3.5 h-3.5 text-[var(--accent)]" />
-                  <span className="text-[11px] text-[var(--muted)] font-medium tracking-wide">
-                    {stat.label}
-                  </span>
-                </div>
+                <span
+                  className="about-counter block font-[var(--font-display)] text-[42px] font-bold text-[var(--ink)] leading-none mb-2"
+                  data-target={stat.value}
+                  data-suffix={stat.suffix}
+                >
+                  {stat.raw}
+                </span>
+                <span className="text-[13px] text-[var(--muted)] font-medium">
+                  {stat.label}
+                </span>
               </div>
             ))}
           </div>
+
         </div>
       </div>
     </section>

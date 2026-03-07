@@ -1,142 +1,61 @@
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { 
-  Store, 
-  Zap, 
-  Palette, 
-  CreditCard, 
-  TrendingUp,
-  Gauge,
-  Globe,
-  Code,
-  ArrowRight
+import {
+  ShoppingBag, Zap, Globe, CreditCard,
+  TrendingUp, Gauge, Code2, Puzzle
 } from 'lucide-react';
-
-gsap.registerPlugin(ScrollTrigger);
-
-const services = [
-  {
-    icon: Store,
-    title: 'Shopify Development',
-    description: 'Custom stores that convert',
-  },
-  {
-    icon: Zap,
-    title: 'Shopify Plus',
-    description: 'Enterprise commerce solutions',
-  },
-  {
-    icon: Palette,
-    title: 'Arabic-First UX',
-    description: 'Culturally adapted design',
-  },
-  {
-    icon: CreditCard,
-    title: 'GCC Payments',
-    description: 'Tap, Tabby, Tamara & more',
-  },
-  {
-    icon: TrendingUp,
-    title: 'CRO & Growth',
-    description: 'Data-driven optimisation',
-  },
-  {
-    icon: Gauge,
-    title: 'Core Web Vitals',
-    description: 'Sub-2s load times',
-  },
-  {
-    icon: Globe,
-    title: 'Headless Commerce',
-    description: 'Next.js + Shopify API',
-  },
-  {
-    icon: Code,
-    title: 'Custom Apps',
-    description: 'Bespoke functionality',
-  },
-];
+import { useLanguage } from '../context/LanguageContext';
+import { translations, useT } from '@/i18n/translation';
 
 export default function ServicesStrip() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
+  const { lang } = useLanguage();
+  const t = useT(lang);
+  const tx = translations.servicesStrip;
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Cards entrance animation
-      gsap.fromTo('.service-strip-card',
-        { opacity: 0, y: 30, scale: 0.95 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.6,
-          stagger: 0.08,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 85%',
-            once: true,
-          },
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
+  const cards = [
+    { Icon: ShoppingBag, title: t(tx.card1_title), desc: t(tx.card1_desc) },
+    { Icon: Zap,         title: t(tx.card2_title), desc: t(tx.card2_desc) },
+    { Icon: Globe,       title: t(tx.card3_title), desc: t(tx.card3_desc) },
+    { Icon: CreditCard,  title: t(tx.card4_title), desc: t(tx.card4_desc) },
+    { Icon: TrendingUp,  title: t(tx.card5_title), desc: t(tx.card5_desc) },
+    { Icon: Gauge,       title: t(tx.card6_title), desc: t(tx.card6_desc) },
+    { Icon: Code2,       title: t(tx.card7_title), desc: t(tx.card7_desc) },
+    { Icon: Puzzle,      title: t(tx.card8_title), desc: t(tx.card8_desc) },
+  ];
 
   return (
-    <section ref={sectionRef} className="py-16 bg-[var(--ink)] relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[rgba(43,92,230,0.08)] rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[rgba(184,146,42,0.05)] rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '1s' }} />
-      </div>
+    <section className="reveal-section bg-[var(--ink)] py-24">
+      <div className="container">
 
-      <div className="container relative z-10">
         {/* Header */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full mb-4">
-            <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse" />
-            <span className="text-[11px] font-semibold tracking-wider uppercase text-white/60">
-              Our Services
-            </span>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-14">
+          <div>
+            <span className="tag mb-3 border-white/20 text-white/60">{t(tx.heading)}</span>
+            <h2 className="font-[var(--font-display)] text-[clamp(28px,4vw,48px)] font-bold text-white leading-tight">
+              {t(tx.subheading)}
+            </h2>
           </div>
-          <h3 className="text-[clamp(24px,3vw,36px)] font-[var(--font-display)] text-white">
-            Everything You Need to <span className="text-[var(--accent)]">Win in GCC</span>
-          </h3>
         </div>
 
-        {/* Services Grid */}
-        <div ref={cardsRef} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {services.map((service, index) => (
+        {/* Cards grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10 rounded-2xl overflow-hidden">
+          {cards.map((card, i) => (
             <div
-              key={index}
-              className="service-strip-card group relative bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-[var(--accent)]/30 rounded-xl p-5 transition-all duration-300 cursor-pointer"
+              key={i}
+              className="group relative bg-[var(--ink)] p-6 flex flex-col gap-3 hover:bg-[var(--ink-2)] transition-colors duration-300 cursor-default"
             >
-              {/* Glow effect on hover */}
-              <div className="absolute inset-0 rounded-xl bg-[var(--accent)]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              
-              <div className="relative z-10">
-                <div className="w-10 h-10 rounded-lg bg-[var(--accent)]/20 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-[var(--accent)]/30 transition-all duration-300">
-                  <service.icon className="w-5 h-5 text-[var(--accent)]" />
-                </div>
-                <h4 className="text-[14px] font-semibold text-white mb-1 group-hover:text-[var(--accent)] transition-colors">
-                  {service.title}
-                </h4>
-                <p className="text-[11px] text-white/40 leading-relaxed">
-                  {service.description}
-                </p>
-                
-                <div className="flex items-center gap-1 mt-3 text-[10px] text-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity">
-                  Learn more
-                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                </div>
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-[var(--accent)]/5" />
+
+              <div className="w-10 h-10 rounded-xl bg-white/5 group-hover:bg-[var(--accent)] flex items-center justify-center transition-colors duration-300">
+                <card.Icon className="w-5 h-5 text-white/60 group-hover:text-white transition-colors duration-300" />
+              </div>
+
+              <div>
+                <p className="text-white font-semibold text-[14px] leading-tight mb-1">{card.title}</p>
+                <p className="text-white/40 text-[12px] leading-relaxed">{card.desc}</p>
               </div>
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );
