@@ -6,6 +6,14 @@
     <title>StackoraLabs</title>
     <script>
       (function() {
+        // Restore path from GitHub Pages 404 redirect
+        var redirect = sessionStorage.getItem('gh-pages-redirect');
+        if (redirect) {
+          sessionStorage.removeItem('gh-pages-redirect');
+          var url = new URL(redirect, window.location.origin);
+          window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+        }
+        // Restore theme
         var saved = localStorage.getItem('stackora-theme');
         var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         var theme = saved || (prefersDark ? 'dark' : 'light');
