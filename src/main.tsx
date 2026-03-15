@@ -12,7 +12,7 @@ createRoot(document.getElementById('root')!).render(
     <ThemeProvider>
       <LanguageProvider>
         <CookieProvider>
-          <BrowserRouter>
+          <BrowserRouter basename="/stackoralabs">
             <App />
           </BrowserRouter>
         </CookieProvider>
