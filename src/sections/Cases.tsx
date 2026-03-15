@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Link } from 'react-router-dom';
 import { ArrowRight, TrendingUp, Users, ShoppingBag, Star } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -154,15 +155,6 @@ export default function Cases() {
     return () => ctx.revert();
   }, []);
 
-  const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    const target = document.querySelector(href);
-    if (target) {
-      const offset = 80;
-      const targetPosition = target.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top: targetPosition, behavior: 'smooth' });
-    }
-  };
 
   return (
     <section ref={sectionRef} id="cases" className="section bg-[var(--bg-2)] relative">
@@ -176,14 +168,10 @@ export default function Cases() {
               <span className="text-[var(--accent)]">We've Scaled.</span>
             </h2>
           </div>
-          <a
-            href="#contact"
-            onClick={(e) => handleScrollTo(e, '#contact')}
-            className="btn btn-primary w-fit group"
-          >
+          <Link to="/contact" className="btn btn-primary w-fit group">
             Start Your Project
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </a>
+          </Link>
         </div>
 
         {/* Bento Grid */}
@@ -258,7 +246,7 @@ export default function Cases() {
           </div>
 
           {/* Stats Card */}
-          <div className="bento-card bg-[var(--ink)] rounded-2xl overflow-hidden p-6 lg:p-8 flex flex-col justify-between relative">
+          <div className="bento-card dark-section rounded-2xl overflow-hidden p-6 lg:p-8 flex flex-col justify-between relative">
             {/* Subtle gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent)]/5 to-transparent" />
             

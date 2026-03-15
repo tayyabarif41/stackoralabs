@@ -20,6 +20,29 @@ export default function About() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+
+      // Left column: tag → heading → paragraphs → buttons
+      gsap.fromTo('.about-tag',
+        { opacity: 0, x: -20 },
+        { opacity: 1, x: 0, duration: 0.55, ease: 'power3.out',
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true } }
+      );
+      gsap.fromTo('.about-heading',
+        { opacity: 0, y: 36 },
+        { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out', delay: 0.1,
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true } }
+      );
+      gsap.fromTo('.about-body',
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: 'power2.out', delay: 0.2,
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true } }
+      );
+      gsap.fromTo('.about-ctas',
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', delay: 0.35,
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true } }
+      );
+
       gsap.fromTo('.about-stat',
         { opacity: 0, y: 32, scale: 0.95 },
         {
@@ -69,17 +92,17 @@ export default function About() {
 
           {/* Left: text */}
           <div>
-            <span className="tag mb-6">{t(tx.tag)}</span>
-            <h2 className="font-[var(--font-display)] text-[clamp(28px,4vw,52px)] font-bold text-[var(--ink)] leading-tight mb-6">
+            <span className="about-tag tag mb-6">{t(tx.tag)}</span>
+            <h2 className="about-heading font-[var(--font-display)] text-[clamp(28px,4vw,52px)] font-bold text-[var(--ink)] leading-tight mb-6">
               {t(tx.heading)}
             </h2>
-            <p className="text-[var(--muted)] text-[16px] leading-relaxed mb-4">
+            <p className="about-body text-[var(--muted)] text-[16px] leading-relaxed mb-4">
               {t(tx.body1)}
             </p>
-            <p className="text-[var(--muted)] text-[16px] leading-relaxed mb-10">
+            <p className="about-body text-[var(--muted)] text-[16px] leading-relaxed mb-10">
               {t(tx.body2)}
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="about-ctas flex flex-wrap gap-3">
               <a href="#services" className="btn btn-primary gap-2">
                 {t(tx.cta_services)}
                 <ArrowRight className="w-4 h-4" />

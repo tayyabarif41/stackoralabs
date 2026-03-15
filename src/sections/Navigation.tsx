@@ -1,9 +1,11 @@
-import { useEffect, useState, useRef } from 'react';
-import type { MouseEvent, ElementType } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import type { ElementType } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
-import { Menu, X, LayoutGrid, Briefcase, GitBranch, Tag, MessageCircle, BookOpen } from 'lucide-react';
+import { Menu, X, Home, LayoutGrid, Briefcase, MessageCircle, BookOpen, Info, Sun, Moon, ChevronDown, Check } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
+import { translations, useT } from '../i18n/translation';
 
 interface NavLink {
   href: string;
@@ -11,27 +13,44 @@ interface NavLink {
   labelAr: string;
   Icon: ElementType;
   isRoute?: boolean;
+  isScroll?: boolean;
 }
 
 const NAV_LINKS: NavLink[] = [
-  { href: '#services', labelEn: 'Services', labelAr: 'خدماتنا',    Icon: LayoutGrid    },
-  { href: '#cases',    labelEn: 'Work',     labelAr: 'أعمالنا',    Icon: Briefcase     },
-  { href: '#process',  labelEn: 'Process',  labelAr: 'منهجيتنا',   Icon: GitBranch     },
-  { href: '#pricing',  labelEn: 'Pricing',  labelAr: 'الأسعار',    Icon: Tag           },
-  { href: '#contact',  labelEn: 'Contact',  labelAr: 'تواصل معنا', Icon: MessageCircle },
-  { href: '/blog',     labelEn: 'Blog',     labelAr: 'المدونة',     Icon: BookOpen, isRoute: true },
+  { href: '/',         labelEn: 'Home',     labelAr: 'الرئيسية',   Icon: Home,          isRoute: true },
+  { href: '/services', labelEn: 'Services', labelAr: 'خدماتنا',    Icon: LayoutGrid,    isRoute: true },
+  { href: '/work',     labelEn: 'Work',     labelAr: 'أعمالنا',    Icon: Briefcase,     isRoute: true },
+  { href: '/about',    labelEn: 'About',    labelAr: 'من نحن',     Icon: Info,          isRoute: true },
+  { href: '/contact',  labelEn: 'Contact',  labelAr: 'تواصل معنا', Icon: MessageCircle, isRoute: true },
+  { href: '/blog',     labelEn: 'Blog',     labelAr: 'المدونة',    Icon: BookOpen,      isRoute: true },
 ];
 
-const SECTION_IDS = ['hero', 'services', 'cases', 'process', 'pricing', 'contact'];
+const SCROLL_SECTION_IDS = ['hero'];
+
+const LANGUAGES = [
+  { code: 'en' as const, label: 'English',  native: 'English'  },
+  { code: 'ar' as const, label: 'Arabic',   native: 'العربية'  },
+];
 
 export default function Navigation() {
-  const { lang, toggleLang } = useLanguage();
+  const { lang, setLang }       = useLanguage();
+  const { theme, toggleTheme }  = useTheme();
+  const t   = useT(lang);
+  const tx  = translations.nav;
   const location = useLocation();
-  const [isScrolled, setIsScrolled]       = useState(false);
-  const [isMobileOpen, setIsMobileOpen]   = useState(false);
+  const navigate = useNavigate();
+
+  const [isScrolled,    setIsScrolled]    = useState(false);
+  const [isMobileOpen,  setIsMobileOpen]  = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
-  const drawerRef   = useRef<HTMLDivElement>(null);
-  const backdropRef = useRef<HTMLDivElement>(null);
+  const [isLangOpen,    setIsLangOpen]    = useState(false);
+  const [isAnimating,   setIsAnimating]   = useState(false);
+
+  const drawerRef      = useRef<HTMLDivElement>(null);
+  const backdropRef    = useRef<HTMLDivElement>(null);
+  const themeButtonRef = useRef<HTMLButtonElement>(null);
+  const iconRef        = useRef<HTMLSpanElement>(null);
+  const langDropRef    = useRef<HTMLDivElement>(null);
 
   // scroll detection
   useEffect(() => {
@@ -42,8 +61,9 @@ export default function Navigation() {
 
   // active section
   useEffect(() => {
+    if (location.pathname !== '/') return;
     const observers: IntersectionObserver[] = [];
-    SECTION_IDS.forEach((id) => {
+    SCROLL_SECTION_IDS.forEach((id) => {
       const el = document.getElementById(id);
       if (!el) return;
       const obs = new IntersectionObserver(
@@ -54,13 +74,25 @@ export default function Navigation() {
       observers.push(obs);
     });
     return () => observers.forEach((obs) => obs.disconnect());
-  }, []);
+  }, [location.pathname]);
 
   // body scroll lock
   useEffect(() => {
     document.body.style.overflow = isMobileOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isMobileOpen]);
+
+  // close lang dropdown on outside click
+  useEffect(() => {
+    if (!isLangOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (langDropRef.current && !langDropRef.current.contains(e.target as Node)) {
+        setIsLangOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [isLangOpen]);
 
   // drawer open animation
   useEffect(() => {
@@ -86,14 +118,10 @@ export default function Navigation() {
 
   const closeDrawer = () => {
     const slideTo = lang === 'ar' ? '-100%' : '100%';
-    if (backdropRef.current) {
-      gsap.to(backdropRef.current, { opacity: 0, duration: 0.2 });
-    }
+    if (backdropRef.current) gsap.to(backdropRef.current, { opacity: 0, duration: 0.2 });
     if (drawerRef.current) {
       gsap.to(drawerRef.current, {
-        x: slideTo,
-        duration: 0.32,
-        ease: 'power3.in',
+        x: slideTo, duration: 0.32, ease: 'power3.in',
         onComplete: () => setIsMobileOpen(false),
       });
     } else {
@@ -101,34 +129,145 @@ export default function Navigation() {
     }
   };
 
-  const scrollToSection = (href: string) => {
-    const el = document.querySelector(href);
+  const scrollToAnchor = (hash: string) => {
+    const el = document.querySelector(hash);
     if (!el) return;
-    window.scrollTo({
-      top: el.getBoundingClientRect().top + window.scrollY - 80,
-      behavior: 'smooth',
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+  };
+
+  const handleScrollLink = (hash: string, wasOpen: boolean) => {
+    const delay = wasOpen ? 360 : 0;
+    if (location.pathname === '/') {
+      setTimeout(() => scrollToAnchor(hash), delay);
+    } else {
+      navigate('/' + hash);
+    }
+  };
+
+  // ── Dark mode toggle with GSAP animation ──────────────────────
+  const handleThemeToggle = useCallback(() => {
+    if (isAnimating || !iconRef.current || !themeButtonRef.current) return;
+    setIsAnimating(true);
+
+    const btn  = themeButtonRef.current;
+    const icon = iconRef.current;
+    const tl   = gsap.timeline({
+      onComplete: () => setIsAnimating(false),
     });
+
+    // 1. Button background pulse
+    tl.to(btn, {
+      scale: 0.88,
+      duration: 0.12,
+      ease: 'power2.in',
+    })
+    // 2. Icon shrinks + spins out
+    .to(icon, {
+      scale: 0,
+      rotate: 180,
+      duration: 0.18,
+      ease: 'power2.in',
+    }, '<')
+    // 3. Switch theme mid-animation
+    .call(toggleTheme)
+    // 4. Button bounces back + glows
+    .to(btn, {
+      scale: 1.12,
+      duration: 0.2,
+      ease: 'back.out(3)',
+    })
+    .to(btn, {
+      scale: 1,
+      duration: 0.15,
+      ease: 'power2.out',
+    })
+    // 5. New icon spins in
+    .fromTo(icon,
+      { scale: 0, rotate: -180 },
+      { scale: 1, rotate: 0, duration: 0.28, ease: 'back.out(2.5)' },
+      '<-0.1'
+    )
+    // 6. Subtle glow pulse on the button
+    .fromTo(btn,
+      { boxShadow: '0 0 0px 0px rgba(43,92,230,0.5)' },
+      { boxShadow: '0 0 0px 0px rgba(43,92,230,0)', duration: 0.5,
+        ease: 'power2.out', clearProps: 'boxShadow' },
+      '-=0.4'
+    );
+  }, [isAnimating, toggleTheme]);
+
+  const isActive = (link: NavLink): boolean => {
+    if (link.isRoute) {
+      if (link.href === '/') return location.pathname === '/';
+      return location.pathname.startsWith(link.href);
+    }
+    return location.pathname === '/' && activeSection === link.href.replace('#', '');
   };
 
-  const onLinkClick = (e: MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    const wasOpen = isMobileOpen;
-    if (wasOpen) closeDrawer();
-    setTimeout(() => scrollToSection(href), wasOpen ? 360 : 0);
+  const getLabel = (link: NavLink) => lang === 'ar' ? link.labelAr : link.labelEn;
+
+  const linkClass = (active: boolean) =>
+    `relative flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 ${
+      active
+        ? 'text-[var(--ink)] bg-[var(--bg-2)]'
+        : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)]'
+    }`;
+
+  const drawerLinkClass = (active: boolean) =>
+    `flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-[15px] font-semibold transition-all ${
+      active
+        ? 'bg-[var(--accent-light)] text-[var(--accent)]'
+        : 'text-[var(--ink-2)] hover:bg-[var(--bg-2)]'
+    }`;
+
+  const renderDesktopLink = (link: NavLink) => {
+    const active = isActive(link);
+    const cls    = linkClass(active);
+    const dot    = active && (
+      <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-[5px] h-[5px] rounded-full bg-[var(--accent)]" />
+    );
+    if (link.isRoute) {
+      return (
+        <Link to={link.href} className={cls}>
+          <link.Icon className="w-[14px] h-[14px] opacity-50 shrink-0" />
+          {getLabel(link)}
+          {dot}
+        </Link>
+      );
+    }
+    return (
+      <a href={link.href} onClick={(e) => { e.preventDefault(); handleScrollLink(link.href, false); }} className={cls}>
+        <link.Icon className="w-[14px] h-[14px] opacity-50 shrink-0" />
+        {getLabel(link)}
+        {dot}
+      </a>
+    );
   };
 
-  const onCtaClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    const wasOpen = isMobileOpen;
-    if (wasOpen) closeDrawer();
-    setTimeout(() => scrollToSection('#contact'), wasOpen ? 360 : 0);
+  const renderDrawerLink = (link: NavLink) => {
+    const active = isActive(link);
+    const cls    = drawerLinkClass(active);
+    const dot    = active && <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" />;
+    if (link.isRoute) {
+      return (
+        <Link to={link.href} className={cls} onClick={closeDrawer}>
+          <link.Icon className="w-[18px] h-[18px] opacity-60 shrink-0" />
+          <span className="flex-1">{getLabel(link)}</span>
+          {dot}
+        </Link>
+      );
+    }
+    return (
+      <a href={link.href} onClick={(e) => { e.preventDefault(); closeDrawer(); handleScrollLink(link.href, true); }} className={cls}>
+        <link.Icon className="w-[18px] h-[18px] opacity-60 shrink-0" />
+        <span className="flex-1">{getLabel(link)}</span>
+        {dot}
+      </a>
+    );
   };
 
-  const isActive  = (link: NavLink) =>
-    link.isRoute
-      ? location.pathname.startsWith(link.href)
-      : activeSection === link.href.replace('#', '');
-  const getLabel  = (link: NavLink) => lang === 'ar' ? link.labelAr : link.labelEn;
+  // Current language label
+  const currentLang = LANGUAGES.find((l) => l.code === lang)!;
 
   return (
     <div>
@@ -137,7 +276,7 @@ export default function Navigation() {
       <nav
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
           isScrolled
-            ? 'bg-[rgba(248,246,242,0.96)] backdrop-blur-xl border-b border-[var(--border)] shadow-sm'
+            ? `${theme === 'dark' ? 'bg-[rgba(14,13,11,0.96)]' : 'bg-[rgba(248,246,242,0.96)]'} backdrop-blur-xl border-b border-[var(--border)] shadow-sm`
             : 'bg-transparent'
         }`}
       >
@@ -145,79 +284,92 @@ export default function Navigation() {
           <div className="flex items-center justify-between h-[72px]">
 
             {/* Logo */}
-            <a href="/" className="flex items-center gap-2.5 group shrink-0">
+            <Link to="/" className="flex items-center gap-2.5 group shrink-0">
               <div className="w-7 h-7 bg-[var(--ink)] rounded-md grid grid-cols-2 gap-[3px] p-[6px] transition-transform duration-300 group-hover:scale-105">
-                <span className="bg-white rounded-[1px]"></span>
-                <span className="bg-white/50 rounded-[1px]"></span>
-                <span className="bg-white/50 rounded-[1px]"></span>
-                <span className="bg-white/20 rounded-[1px]"></span>
+                <span className="bg-white rounded-[1px]" />
+                <span className="bg-white/50 rounded-[1px]" />
+                <span className="bg-white/50 rounded-[1px]" />
+                <span className="bg-white/20 rounded-[1px]" />
               </div>
               <span className="text-[15px] font-bold tracking-tight text-[var(--ink)]">
-                Stackora
-                <span className="text-[var(--accent)]">Labs</span>
+                Stackora<span className="text-[var(--accent)]">Labs</span>
               </span>
-            </a>
+            </Link>
 
             {/* Desktop links */}
             <ul className="hidden lg:flex items-center gap-0.5">
-              {NAV_LINKS.map((link) => {
-                const active = isActive(link);
-                const cls = `relative flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 ${
-                  active
-                    ? 'text-[var(--ink)] bg-[var(--bg-2)]'
-                    : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)]'
-                }`;
-                return (
-                  <li key={link.href}>
-                    {link.isRoute ? (
-                      <Link to={link.href} className={cls}>
-                        <link.Icon className="w-[14px] h-[14px] opacity-50 shrink-0" />
-                        {getLabel(link)}
-                        {active && (
-                          <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-[5px] h-[5px] rounded-full bg-[var(--accent)]"></span>
-                        )}
-                      </Link>
-                    ) : (
-                      <a
-                        href={link.href}
-                        onClick={(e: MouseEvent<HTMLAnchorElement>) => onLinkClick(e, link.href)}
-                        className={cls}
-                      >
-                        <link.Icon className="w-[14px] h-[14px] opacity-50 shrink-0" />
-                        {getLabel(link)}
-                        {active && (
-                          <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-[5px] h-[5px] rounded-full bg-[var(--accent)]"></span>
-                        )}
-                      </a>
-                    )}
-                  </li>
-                );
-              })}
+              {NAV_LINKS.map((link) => (
+                <li key={link.href}>{renderDesktopLink(link)}</li>
+              ))}
             </ul>
 
             {/* Right controls */}
             <div className="flex items-center gap-2 shrink-0">
 
-              {/* Lang toggle */}
+              {/* ── Dark mode toggle ─────────────────────── */}
               <button
+                ref={themeButtonRef}
                 type="button"
-                onClick={toggleLang}
-                aria-label="Toggle language"
-                className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[11px] font-bold tracking-widest transition-all hover:border-[var(--accent)]/40 hover:bg-[var(--accent-light)]"
+                onClick={handleThemeToggle}
+                aria-label="Toggle dark mode"
+                className="hidden sm:flex items-center justify-center w-9 h-9 rounded-lg border border-[var(--border)] text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)] hover:border-[var(--border-2)] transition-colors duration-200 will-change-transform"
               >
-                <span className={lang === 'ar' ? 'text-[var(--accent)]' : 'text-[var(--muted)]'}>ع</span>
-                <span className="text-[var(--muted-2)] opacity-50">/</span>
-                <span className={lang === 'en' ? 'text-[var(--accent)]' : 'text-[var(--muted)]'}>EN</span>
+                <span ref={iconRef} className="flex items-center justify-center will-change-transform">
+                  {theme === 'dark'
+                    ? <Sun  className="w-[15px] h-[15px]" />
+                    : <Moon className="w-[15px] h-[15px]" />
+                  }
+                </span>
               </button>
 
-              {/* CTA button */}
-              <a
-                href="#contact"
-                onClick={onCtaClick}
-                className="hidden sm:inline-flex btn btn-accent text-[11px] py-2.5 px-5"
-              >
-                {lang === 'ar' ? 'ابدأ مشروعك' : 'Start a Project'}
-              </a>
+              {/* ── Language dropdown ────────────────────── */}
+              <div ref={langDropRef} className="relative hidden sm:block">
+                <button
+                  type="button"
+                  onClick={() => setIsLangOpen((o) => !o)}
+                  aria-label="Select language"
+                  aria-expanded={isLangOpen}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[12px] font-semibold text-[var(--muted)] hover:text-[var(--ink)] hover:border-[var(--border-2)] hover:bg-[var(--bg-2)] transition-all duration-200"
+                >
+                  <span>{currentLang.native}</span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${isLangOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+
+                {/* Dropdown panel */}
+                <div
+                  className={`absolute top-[calc(100%+8px)] ${lang === 'ar' ? 'left-0' : 'right-0'} min-w-[148px] bg-white border border-[var(--border)] rounded-xl shadow-lg overflow-hidden transition-all duration-200 origin-top ${
+                    isLangOpen
+                      ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
+                      : 'opacity-0 scale-95 -translate-y-1 pointer-events-none'
+                  }`}
+                >
+                  {LANGUAGES.map((l) => (
+                    <button
+                      key={l.code}
+                      type="button"
+                      onClick={() => { setLang(l.code); setIsLangOpen(false); }}
+                      className={`w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-colors duration-150 ${
+                        lang === l.code
+                          ? 'bg-[var(--accent-light)] text-[var(--accent)]'
+                          : 'text-[var(--ink)] hover:bg-[var(--bg-2)]'
+                      }`}
+                    >
+                      <span className="flex flex-col items-start gap-0.5">
+                        <span className="text-[12px] font-semibold">{l.native}</span>
+                        <span className="text-[10px] text-[var(--muted-2)]">{l.label}</span>
+                      </span>
+                      {lang === l.code && <Check className="w-3.5 h-3.5 shrink-0" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* CTA */}
+              <Link to="/contact" className="hidden sm:inline-flex btn btn-accent text-[11px] py-2.5 px-5">
+                {t(tx.cta)}
+              </Link>
 
               {/* Hamburger */}
               <button
@@ -230,51 +382,42 @@ export default function Navigation() {
               </button>
 
             </div>
-            {/* end right controls */}
-
           </div>
-          {/* end flex row */}
-
         </div>
-        {/* end container */}
-
       </nav>
-      {/* end nav */}
 
       {/* ── Mobile drawer ─────────────────────────────────────────── */}
       {isMobileOpen && (
         <div className="fixed inset-0 z-[60]">
+          <div ref={backdropRef} onClick={closeDrawer} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
 
-          {/* Backdrop */}
-          <div
-            ref={backdropRef}
-            onClick={closeDrawer}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-          ></div>
-
-          {/* Drawer panel */}
           <div
             ref={drawerRef}
-            className={`absolute top-0 bottom-0 ${
-              lang === 'ar' ? 'left-0' : 'right-0'
-            } w-[min(88vw,380px)] bg-white flex flex-col shadow-2xl`}
+            className={`absolute top-0 bottom-0 ${lang === 'ar' ? 'left-0' : 'right-0'} w-[min(88vw,380px)] bg-white flex flex-col shadow-2xl`}
           >
-
             {/* Drawer header */}
             <div className="flex items-center justify-between px-5 h-[72px] border-b border-[var(--border)] shrink-0">
               <span className="text-[15px] font-bold tracking-tight text-[var(--ink)]">
-                Stackora
-                <span className="text-[var(--accent)]">Labs</span>
+                Stackora<span className="text-[var(--accent)]">Labs</span>
               </span>
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={toggleLang}
-                  aria-label="Toggle language"
-                  className="px-2.5 py-1.5 rounded-lg border border-[var(--border)] text-[11px] font-bold text-[var(--muted)] hover:text-[var(--ink)] transition-all"
-                >
-                  {lang === 'en' ? 'ع' : 'EN'}
-                </button>
+                {/* Language options inline in drawer */}
+                <div className="flex items-center gap-1 p-1 rounded-lg bg-[var(--bg-2)] border border-[var(--border)]">
+                  {LANGUAGES.map((l) => (
+                    <button
+                      key={l.code}
+                      type="button"
+                      onClick={() => setLang(l.code)}
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all duration-200 ${
+                        lang === l.code
+                          ? 'bg-white text-[var(--accent)] shadow-sm'
+                          : 'text-[var(--muted)] hover:text-[var(--ink)]'
+                      }`}
+                    >
+                      {l.code === 'en' ? 'EN' : 'ع'}
+                    </button>
+                  ))}
+                </div>
                 <button
                   type="button"
                   onClick={closeDrawer}
@@ -285,65 +428,26 @@ export default function Navigation() {
                 </button>
               </div>
             </div>
-            {/* end drawer header */}
 
             {/* Drawer links */}
             <div className="flex-1 overflow-y-auto px-3 py-3">
               <ul className="space-y-0.5">
-                {NAV_LINKS.map((link) => {
-                  const active = isActive(link);
-                  const cls = `flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-[15px] font-semibold transition-all ${
-                    active
-                      ? 'bg-[var(--accent-light)] text-[var(--accent)]'
-                      : 'text-[var(--ink-2)] hover:bg-[var(--bg-2)]'
-                  }`;
-                  return (
-                    <li key={link.href} className="drawer-link">
-                      {link.isRoute ? (
-                        <Link to={link.href} className={cls} onClick={closeDrawer}>
-                          <link.Icon className="w-[18px] h-[18px] opacity-60 shrink-0" />
-                          <span className="flex-1">{getLabel(link)}</span>
-                          {active && <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0"></span>}
-                        </Link>
-                      ) : (
-                        <a
-                          href={link.href}
-                          onClick={(e: MouseEvent<HTMLAnchorElement>) => onLinkClick(e, link.href)}
-                          className={cls}
-                        >
-                          <link.Icon className="w-[18px] h-[18px] opacity-60 shrink-0" />
-                          <span className="flex-1">{getLabel(link)}</span>
-                          {active && <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0"></span>}
-                        </a>
-                      )}
-                    </li>
-                  );
-                })}
+                {NAV_LINKS.map((link) => (
+                  <li key={link.href} className="drawer-link">{renderDrawerLink(link)}</li>
+                ))}
               </ul>
             </div>
-            {/* end drawer links */}
 
             {/* Drawer footer */}
             <div className="px-4 pb-6 pt-3 border-t border-[var(--border)] shrink-0">
-              <a
-                href="#contact"
-                onClick={onCtaClick}
-                className="btn btn-accent w-full justify-center py-3.5 text-[13px]"
-              >
-                {lang === 'ar' ? 'ابدأ مشروعك' : 'Start a Project'}
-              </a>
-              <p className="text-center text-[11px] text-[var(--muted-2)] mt-3">
-                hello@stackoralabs.com
-              </p>
+              <Link to="/contact" onClick={closeDrawer} className="btn btn-accent w-full justify-center py-3.5 text-[13px]">
+                {t(tx.cta)}
+              </Link>
+              <p className="text-center text-[11px] text-[var(--muted-2)] mt-3">{t(tx.email)}</p>
             </div>
-            {/* end drawer footer */}
-
           </div>
-          {/* end drawer panel */}
-
         </div>
       )}
-      {/* end mobile drawer */}
 
     </div>
   );

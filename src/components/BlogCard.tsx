@@ -1,68 +1,128 @@
 import { Link } from 'react-router-dom';
-import type { BlogPost } from '@/data/blogPosts';
-import { useLanguage } from '@/context/LanguageContext';
-import { translations, useT } from '@/i18n/translation';
+import { Calendar, Clock, Heart } from 'lucide-react';
+import type { BlogPost } from '@/types/blog';
 
 interface BlogCardProps {
   post: BlogPost;
+  variant?: 'default' | 'compact' | 'featured';
   className?: string;
 }
 
-export default function BlogCard({ post, className = '' }: BlogCardProps) {
-  const { lang } = useLanguage();
-  const t = useT(lang);
-  const tx = translations.blog;
+function blogUrl(post: BlogPost) {
+  return `/blog/${post.id}-${post.slug}`;
+}
 
-  const title   = lang === 'ar' ? post.title.ar   : post.title.en;
-  const excerpt = lang === 'ar' ? post.excerpt.ar : post.excerpt.en;
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+}
 
-  const formattedDate = new Date(post.publishedAt).toLocaleDateString(
-    lang === 'ar' ? 'ar-SA' : 'en-GB',
-    { year: 'numeric', month: 'long', day: 'numeric' }
-  );
+export default function BlogCard({ post, variant = 'default', className = '' }: BlogCardProps) {
+  if (variant === 'featured') {
+    return (
+      <Link
+        to={blogUrl(post)}
+        className={`group block bg-white rounded-2xl border border-[var(--border)] overflow-hidden card-hover ${className}`}
+      >
+        {post.coverImage ? (
+          <img
+            src={post.coverImage}
+            alt={post.title}
+            className="w-full h-[320px] object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full h-[320px] bg-gradient-to-br from-[var(--accent)] to-[var(--accent-2)] flex items-center justify-center">
+            <span className="text-white/20 text-[80px] font-[var(--font-display)] font-bold leading-none">
+              {post.title.charAt(0)}
+            </span>
+          </div>
+        )}
+        <div className="p-8">
+          {post.tags[0] && (
+            <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-[var(--accent)] mb-3">
+              {post.tags[0]}
+            </span>
+          )}
+          <h2 className="font-[var(--font-display)] text-[clamp(22px,2.5vw,32px)] font-semibold leading-tight text-[var(--ink)] group-hover:text-[var(--accent)] transition-colors mb-3">
+            {post.title}
+          </h2>
+          <p className="text-[15px] text-[var(--muted)] leading-relaxed line-clamp-3 mb-6">
+            {post.description}
+          </p>
+          <div className="flex items-center gap-4 text-[12px] text-[var(--muted-2)]">
+            <img src={post.author.profile_image_90} alt={post.author.name}
+              className="w-8 h-8 rounded-full object-cover" />
+            <span className="font-medium text-[var(--muted)]">{post.author.name}</span>
+            <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{formatDate(post.publishedAt)}</span>
+            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{post.readingTime} min</span>
+          </div>
+        </div>
+      </Link>
+    );
+  }
 
+  if (variant === 'compact') {
+    return (
+      <Link
+        to={blogUrl(post)}
+        className={`group flex items-center gap-4 p-4 rounded-xl hover:bg-[var(--bg-2)] transition-colors ${className}`}
+      >
+        {post.coverImage ? (
+          <img src={post.coverImage} alt={post.title}
+            className="w-16 h-16 rounded-xl object-cover shrink-0" />
+        ) : (
+          <div className="w-16 h-16 rounded-xl bg-[var(--accent-light)] flex items-center justify-center shrink-0">
+            <span className="text-[var(--accent)] text-[24px] font-[var(--font-display)] font-bold leading-none">
+              {post.title.charAt(0)}
+            </span>
+          </div>
+        )}
+        <div className="min-w-0">
+          <p className="text-[13px] font-semibold text-[var(--ink)] leading-snug line-clamp-2 group-hover:text-[var(--accent)] transition-colors">
+            {post.title}
+          </p>
+          <div className="flex items-center gap-3 mt-1.5 text-[11px] text-[var(--muted-2)]">
+            <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{post.readingTime} min</span>
+            <span className="flex items-center gap-1"><Heart className="w-3 h-3" />{post.reactions}</span>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
+  // default
   return (
     <Link
-      to={`/blog/${post.slug}`}
-      className={`group flex flex-col bg-white rounded-2xl border border-[var(--border)] card-hover overflow-hidden ${className}`}
+      to={blogUrl(post)}
+      className={`group flex flex-col bg-white rounded-2xl border border-[var(--border)] overflow-hidden card-hover ${className}`}
     >
-      {/* Cover gradient */}
-      <div
-        className="h-44 w-full shrink-0 relative overflow-hidden"
-        style={{ background: post.coverGradient }}
-      >
-        {/* Category pill */}
-        <span className="absolute top-4 left-4 text-[10px] font-bold uppercase tracking-widest bg-white/15 backdrop-blur-sm text-white px-3 py-1.5 rounded-full border border-white/20">
-          {post.category}
-        </span>
-      </div>
-
-      {/* Card body */}
-      <div className="flex flex-col flex-1 p-5">
-        {/* Title */}
-        <h3
-          className="font-[var(--font-display)] text-[18px] font-semibold text-[var(--ink)] leading-snug mb-2 group-hover:text-[var(--accent)] transition-colors duration-200"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          {title}
+      {post.coverImage ? (
+        <img src={post.coverImage} alt={post.title}
+          className="w-full h-[180px] object-cover group-hover:scale-105 transition-transform duration-500" />
+      ) : (
+        <div className="w-full h-[180px] bg-gradient-to-br from-[var(--accent)] to-[var(--accent-2)] flex items-center justify-center">
+          <span className="text-white/20 text-[60px] font-[var(--font-display)] font-bold leading-none">
+            {post.title.charAt(0)}
+          </span>
+        </div>
+      )}
+      <div className="p-5 flex flex-col flex-1">
+        {post.tags[0] && (
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--accent)] mb-2">
+            {post.tags[0]}
+          </span>
+        )}
+        <h3 className="font-[var(--font-display)] text-[18px] font-semibold leading-snug text-[var(--ink)] group-hover:text-[var(--accent)] transition-colors line-clamp-2 mb-2">
+          {post.title}
         </h3>
-
-        {/* Excerpt */}
-        <p className="text-[var(--muted)] text-[13px] leading-relaxed line-clamp-3 flex-1 mb-4">
-          {excerpt}
+        <p className="text-[13px] text-[var(--muted)] leading-relaxed line-clamp-3 flex-1 mb-4">
+          {post.description}
         </p>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t border-[var(--border)] mt-auto">
-          <div className="flex items-center gap-2">
-            <span className="text-base leading-none">{post.authorAvatar}</span>
-            <div>
-              <p className="text-[12px] font-semibold text-[var(--ink)] leading-tight">{post.author}</p>
-              <p className="text-[11px] text-[var(--muted-2)] leading-tight">{formattedDate}</p>
-            </div>
-          </div>
-          <span className="text-[11px] text-[var(--muted-2)] shrink-0">
-            {post.readTime} {t(tx.min_read)}
+        <div className="flex items-center gap-3 text-[11px] text-[var(--muted-2)] mt-auto">
+          <img src={post.author.profile_image_90} alt={post.author.name}
+            className="w-6 h-6 rounded-full object-cover" />
+          <span className="font-medium text-[var(--muted)] truncate">{post.author.name}</span>
+          <span className="ml-auto flex items-center gap-1 shrink-0">
+            <Clock className="w-3 h-3" />{post.readingTime} min
           </span>
         </div>
       </div>

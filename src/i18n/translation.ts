@@ -6,6 +6,7 @@ export const translations = {
     process:      { en: 'Process',          ar: 'منهجيتنا'      },
     pricing:      { en: 'Pricing',          ar: 'الأسعار'       },
     contact:      { en: 'Contact',          ar: 'تواصل معنا'    },
+    about:        { en: 'About',            ar: 'من نحن'         },
     blog:         { en: 'Blog',             ar: 'المدونة'        },
     cta:          { en: 'Start a Project',  ar: 'ابدأ مشروعك'   },
     email:        { en: 'hello@stackoralabs.com', ar: 'hello@stackoralabs.com' },

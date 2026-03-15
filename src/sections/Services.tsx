@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { ElementType } from 'react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import gsap from 'gsap';
 import {
   ShoppingBag, Zap, Globe, CreditCard, TrendingUp,
@@ -73,7 +74,26 @@ export default function Services() {
   const t = useT(lang);
   const tx = translations.services;
   const [activeTab, setActiveTab] = useState(0);
-  const gridRef = useRef<HTMLDivElement>(null);
+  const gridRef    = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const ctx = gsap.context(() => {
+      gsap.fromTo('.svc-sidebar',
+        { opacity: 0, x: -40 },
+        { opacity: 1, x: 0, duration: 0.8, ease: 'power3.out',
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 78%', once: true } }
+      );
+      gsap.fromTo('.svc-grid-card',
+        { opacity: 0, y: 32, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1,
+          duration: 0.5, stagger: { amount: 0.45, from: 'start' }, ease: 'power2.out', delay: 0.15,
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 75%', once: true } }
+      );
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
 
   const switchTab = (index: number) => {
     if (!gridRef.current) { setActiveTab(index); return; }
@@ -89,12 +109,12 @@ export default function Services() {
   const currentTab = TABS[activeTab];
 
   return (
-    <section id="services" className="reveal-section section bg-[var(--bg-2)]">
+    <section ref={sectionRef} id="services" className="section bg-[var(--bg-2)]">
       <div className="container">
         <div className="grid lg:grid-cols-[280px_1fr] gap-14">
 
           {/* Sidebar */}
-          <div className="lg:sticky lg:top-24 self-start">
+          <div className="svc-sidebar lg:sticky lg:top-24 self-start">
             <span className="tag mb-4">{t(tx.tag)}</span>
             <h2 className="font-[var(--font-display)] text-[clamp(24px,3vw,42px)] font-bold text-[var(--ink)] leading-tight mb-3">
               {t(tx.heading)}
@@ -127,7 +147,7 @@ export default function Services() {
             {currentTab.services.map((service, i) => (
               <div
                 key={i}
-                className="group relative bg-white rounded-2xl p-6 border border-[var(--border)] card-hover overflow-hidden cursor-default"
+                className="svc-grid-card group relative bg-white rounded-2xl p-6 border border-[var(--border)] card-hover overflow-hidden cursor-default"
               >
                 {/* Bottom accent line */}
                 <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--accent)] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />

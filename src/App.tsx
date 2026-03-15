@@ -1,71 +1,43 @@
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Navigation from './sections/Navigation';
-import Hero from './sections/Hero';
-import ServicesStrip from './sections/ServicesStrip';
-import About from './sections/About';
-import Positioning from './sections/Positioning';
-import Services from './sections/Services';
-import Process from './sections/Process';
-import Cases from './sections/Cases';
-import WhyUs from './sections/WhyUs';
-import Testimonials from './sections/Testimonials';
-import Pricing from './sections/Pricing';
-import Contact from './sections/Contact';
-import CTABand from './sections/CTABand';
 import Footer from './sections/Footer';
 import CustomCursor from './components/CustomCursor';
 import AnimatedBackground from './components/AnimatedBackground';
-
-gsap.registerPlugin(ScrollTrigger);
+import ScrollToTop from './components/ScrollToTop';
+import CookieConsent from './components/CookieConsent';
+import Preloader from './components/Preloader';
+import Home from './pages/Home';
+import ServicesPage from './pages/ServicesPage';
+import AboutPage from './pages/AboutPage';
+import WorkPage from './pages/WorkPage';
+import ContactPage from './pages/ContactPage';
+import BlogList from './pages/BlogList';
+import BlogPost from './pages/BlogPost';
 
 function App() {
-  const mainRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>('.reveal-section').forEach((section) => {
-        gsap.fromTo(section,
-          { opacity: 0, y: 50 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.9,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: section,
-              start: 'top 85%',
-              once: true,
-            }
-          }
-        );
-      });
-    }, mainRef);
-
-    return () => ctx.revert();
-  }, []);
+  const [loading, setLoading] = useState(true);
 
   return (
-    <div ref={mainRef} className="relative">
+    <div className="relative">
+      {loading && <Preloader onDone={() => setLoading(false)} />}
+      <ScrollToTop />
       <CustomCursor />
-      <AnimatedBackground />
+      {/* <AnimatedBackground /> */}
       <Navigation />
       <main className="relative z-10">
-        <Hero />
-        <ServicesStrip />
-        <About />
-        <Positioning />
-        <Services />
-        <Process />
-        <Cases />
-        <WhyUs />
-        <Testimonials />
-        <Pricing />
-        <Contact />
-        <CTABand />
+        <Routes>
+          <Route path="/"           element={<Home />} />
+          <Route path="/services"   element={<ServicesPage />} />
+          <Route path="/work"       element={<WorkPage />} />
+          <Route path="/about"      element={<AboutPage />} />
+          <Route path="/contact"    element={<ContactPage />} />
+          <Route path="/blog"       element={<BlogList />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+        </Routes>
       </main>
       <Footer />
+      {!loading && <CookieConsent />}
     </div>
   );
 }

@@ -48,6 +48,39 @@
   --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
+/* ── DARK MODE TOKENS ─────────────────────────────── */
+[data-theme="dark"] {
+  --bg: #0E0D0B;
+  --bg-2: #161410;
+  --bg-3: #1C1A16;
+  --white: #FFFFFF;
+  --ink: #F5F3EF;
+  --ink-2: #E8E4DC;
+  --muted: #9A9690;
+  --muted-2: #7A7670;
+  --border: #2A2820;
+  --border-2: #3A3830;
+  --accent: #4B7CF6;
+  --accent-2: #2B5CE6;
+  --accent-light: #1A2540;
+  --gold: #D4A83A;
+  --gold-light: #1E1810;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.2);
+  --shadow: 0 4px 16px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.2);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,.5), 0 4px 12px rgba(0,0,0,.3);
+  --shadow-accent: 0 4px 16px rgba(75,124,246,.3);
+  --shadow-glow: 0 0 40px rgba(75,124,246,0.2);
+}
+
+[data-theme="dark"] .dark-section {
+  background: #0A0A08;
+}
+
+[data-theme="dark"] .bg-white {
+  background-color: var(--bg-2) !important;
+}
+
 /* ── BASE STYLES ─────────────────────────────── */
 @layer base {
   *, *::before, *::after {
@@ -251,6 +284,10 @@
     background: rgba(248, 246, 242, 0.85);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+  }
+
+  [data-theme="dark"] .glass {
+    background: rgba(14, 13, 11, 0.85);
   }
 
   .glow-accent {
@@ -461,6 +498,113 @@ body.ar .blog-prose ul li {
 body.ar .blog-prose ul li::before {
   left: auto;
   right: 0;
+}
+
+/* ── DARK SECTION (intentionally dark regardless of theme) ─────── */
+.dark-section {
+  background: #141210;
+  color: #F5F3EF;
+}
+
+/* ── PROSE CONTENT (dev.to body_html) ─────────────────────────── */
+.prose-content {
+  max-width: 720px;
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+.prose-content h1,
+.prose-content h2,
+.prose-content h3,
+.prose-content h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 2.5rem 0 1rem;
+}
+
+.prose-content h2 { font-size: clamp(22px, 2.5vw, 30px); }
+.prose-content h3 { font-size: clamp(18px, 2vw, 22px); }
+
+.prose-content p  { margin-bottom: 1.35rem; }
+
+.prose-content a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose-content a:hover { color: var(--accent-2); }
+
+.prose-content blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 1.1rem 1.5rem;
+  margin: 2rem 0;
+  background: var(--accent-light);
+  border-radius: 0 10px 10px 0;
+  font-style: italic;
+  color: var(--ink-2);
+}
+
+.prose-content ul,
+.prose-content ol {
+  margin: 1.25rem 0 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.prose-content li { margin-bottom: 0.6rem; line-height: 1.75; }
+
+.prose-content pre {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  font-size: 14px;
+}
+
+.prose-content code {
+  background: var(--bg-3);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  font-size: 0.875em;
+  color: var(--ink);
+}
+
+.prose-content pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+.prose-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin: 1.5rem 0;
+}
+
+.prose-content strong { color: var(--ink); font-weight: 600; }
+
+.prose-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
+}
+
+/* ── COOKIE BANNER ─────────────────────────────── */
+@keyframes cookieBannerIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.cookie-banner-enter {
+  animation: cookieBannerIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both;
 }
 
 /* ── FOCUS STATES ─────────────────────────────── */

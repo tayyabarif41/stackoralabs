@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, Briefcase } from 'lucide-react';
@@ -40,7 +41,7 @@ export default function CTABand() {
   };
 
   return (
-    <section ref={sectionRef} id="cta" className="py-24 lg:py-32 bg-[var(--ink)] relative overflow-hidden">
+    <section ref={sectionRef} id="cta" className="py-24 lg:py-32 dark-section relative overflow-hidden">
       {/* Background gradient */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[radial-gradient(circle,rgba(43,92,230,0.15)_0%,transparent_70%)]" />
       
@@ -68,14 +69,13 @@ export default function CTABand() {
               Book Free Strategy Session
               <ArrowRight className="w-4 h-4" />
             </a>
-            <a
-              href="#cases"
-              onClick={(e) => handleScrollTo(e, '#cases')}
+            <Link
+              to="/work"
               className="btn bg-white/10 text-white border border-white/20 hover:bg-white/20"
             >
               <Briefcase className="w-4 h-4" />
               See Our Work
-            </a>
+            </Link>
           </div>
         </div>
       </div>
