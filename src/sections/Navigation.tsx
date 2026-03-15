@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import type { MouseEvent, ElementType } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import gsap from 'gsap';
-import { Menu, X, LayoutGrid, Briefcase, GitBranch, Tag, MessageCircle } from 'lucide-react';
+import { Menu, X, LayoutGrid, Briefcase, GitBranch, Tag, MessageCircle, BookOpen } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 interface NavLink {
@@ -9,6 +10,7 @@ interface NavLink {
   labelEn: string;
   labelAr: string;
   Icon: ElementType;
+  isRoute?: boolean;
 }
 
 const NAV_LINKS: NavLink[] = [
@@ -17,12 +19,14 @@ const NAV_LINKS: NavLink[] = [
   { href: '#process',  labelEn: 'Process',  labelAr: 'منهجيتنا',   Icon: GitBranch     },
   { href: '#pricing',  labelEn: 'Pricing',  labelAr: 'الأسعار',    Icon: Tag           },
   { href: '#contact',  labelEn: 'Contact',  labelAr: 'تواصل معنا', Icon: MessageCircle },
+  { href: '/blog',     labelEn: 'Blog',     labelAr: 'المدونة',     Icon: BookOpen, isRoute: true },
 ];
 
 const SECTION_IDS = ['hero', 'services', 'cases', 'process', 'pricing', 'contact'];
 
 export default function Navigation() {
   const { lang, toggleLang } = useLanguage();
+  const location = useLocation();
   const [isScrolled, setIsScrolled]       = useState(false);
   const [isMobileOpen, setIsMobileOpen]   = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
@@ -120,7 +124,10 @@ export default function Navigation() {
     setTimeout(() => scrollToSection('#contact'), wasOpen ? 360 : 0);
   };
 
-  const isActive  = (href: string) => activeSection === href.replace('#', '');
+  const isActive  = (link: NavLink) =>
+    link.isRoute
+      ? location.pathname.startsWith(link.href)
+      : activeSection === link.href.replace('#', '');
   const getLabel  = (link: NavLink) => lang === 'ar' ? link.labelAr : link.labelEn;
 
   return (
@@ -154,24 +161,35 @@ export default function Navigation() {
             {/* Desktop links */}
             <ul className="hidden lg:flex items-center gap-0.5">
               {NAV_LINKS.map((link) => {
-                const active = isActive(link.href);
+                const active = isActive(link);
+                const cls = `relative flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 ${
+                  active
+                    ? 'text-[var(--ink)] bg-[var(--bg-2)]'
+                    : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)]'
+                }`;
                 return (
                   <li key={link.href}>
-                    <a
-                      href={link.href}
-                      onClick={(e: MouseEvent<HTMLAnchorElement>) => onLinkClick(e, link.href)}
-                      className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 ${
-                        active
-                          ? 'text-[var(--ink)] bg-[var(--bg-2)]'
-                          : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)]'
-                      }`}
-                    >
-                      <link.Icon className="w-[14px] h-[14px] opacity-50 shrink-0" />
-                      {getLabel(link)}
-                      {active && (
-                        <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-[5px] h-[5px] rounded-full bg-[var(--accent)]"></span>
-                      )}
-                    </a>
+                    {link.isRoute ? (
+                      <Link to={link.href} className={cls}>
+                        <link.Icon className="w-[14px] h-[14px] opacity-50 shrink-0" />
+                        {getLabel(link)}
+                        {active && (
+                          <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-[5px] h-[5px] rounded-full bg-[var(--accent)]"></span>
+                        )}
+                      </Link>
+                    ) : (
+                      <a
+                        href={link.href}
+                        onClick={(e: MouseEvent<HTMLAnchorElement>) => onLinkClick(e, link.href)}
+                        className={cls}
+                      >
+                        <link.Icon className="w-[14px] h-[14px] opacity-50 shrink-0" />
+                        {getLabel(link)}
+                        {active && (
+                          <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-[5px] h-[5px] rounded-full bg-[var(--accent)]"></span>
+                        )}
+                      </a>
+                    )}
                   </li>
                 );
               })}
@@ -273,24 +291,31 @@ export default function Navigation() {
             <div className="flex-1 overflow-y-auto px-3 py-3">
               <ul className="space-y-0.5">
                 {NAV_LINKS.map((link) => {
-                  const active = isActive(link.href);
+                  const active = isActive(link);
+                  const cls = `flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-[15px] font-semibold transition-all ${
+                    active
+                      ? 'bg-[var(--accent-light)] text-[var(--accent)]'
+                      : 'text-[var(--ink-2)] hover:bg-[var(--bg-2)]'
+                  }`;
                   return (
                     <li key={link.href} className="drawer-link">
-                      <a
-                        href={link.href}
-                        onClick={(e: MouseEvent<HTMLAnchorElement>) => onLinkClick(e, link.href)}
-                        className={`flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-[15px] font-semibold transition-all ${
-                          active
-                            ? 'bg-[var(--accent-light)] text-[var(--accent)]'
-                            : 'text-[var(--ink-2)] hover:bg-[var(--bg-2)]'
-                        }`}
-                      >
-                        <link.Icon className="w-[18px] h-[18px] opacity-60 shrink-0" />
-                        <span className="flex-1">{getLabel(link)}</span>
-                        {active && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0"></span>
-                        )}
-                      </a>
+                      {link.isRoute ? (
+                        <Link to={link.href} className={cls} onClick={closeDrawer}>
+                          <link.Icon className="w-[18px] h-[18px] opacity-60 shrink-0" />
+                          <span className="flex-1">{getLabel(link)}</span>
+                          {active && <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0"></span>}
+                        </Link>
+                      ) : (
+                        <a
+                          href={link.href}
+                          onClick={(e: MouseEvent<HTMLAnchorElement>) => onLinkClick(e, link.href)}
+                          className={cls}
+                        >
+                          <link.Icon className="w-[18px] h-[18px] opacity-60 shrink-0" />
+                          <span className="flex-1">{getLabel(link)}</span>
+                          {active && <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0"></span>}
+                        </a>
+                      )}
                     </li>
                   );
                 })}

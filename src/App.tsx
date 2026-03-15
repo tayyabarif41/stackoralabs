@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { LanguageProvider } from './context/LanguageContext';
 import Navigation from './sections/Navigation';
 import Hero from './sections/Hero';
 import ServicesStrip from './sections/ServicesStrip';
@@ -48,28 +47,26 @@ function App() {
   }, []);
 
   return (
-    <LanguageProvider>
-      <div ref={mainRef} className="relative">
-        <CustomCursor />
-        <AnimatedBackground />
-        <Navigation />
-        <main className="relative z-10">
-          <Hero />
-          <ServicesStrip />
-          <About />
-          <Positioning />
-          <Services />
-          <Process />
-          <Cases />
-          <WhyUs />
-          <Testimonials />
-          <Pricing />
-          <Contact />
-          <CTABand />
-        </main>
-        <Footer />
-      </div>
-    </LanguageProvider>
+    <div ref={mainRef} className="relative">
+      <CustomCursor />
+      <AnimatedBackground />
+      <Navigation />
+      <main className="relative z-10">
+        <Hero />
+        <ServicesStrip />
+        <About />
+        <Positioning />
+        <Services />
+        <Process />
+        <Cases />
+        <WhyUs />
+        <Testimonials />
+        <Pricing />
+        <Contact />
+        <CTABand />
+      </main>
+      <Footer />
+    </div>
   );
 }
 
