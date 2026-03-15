@@ -20,9 +20,9 @@ const NAV_LINKS: NavLink[] = [
   { href: '/',         labelEn: 'Home',     labelAr: 'الرئيسية',   Icon: Home,          isRoute: true },
   { href: '/services', labelEn: 'Services', labelAr: 'خدماتنا',    Icon: LayoutGrid,    isRoute: true },
   { href: '/work',     labelEn: 'Work',     labelAr: 'أعمالنا',    Icon: Briefcase,     isRoute: true },
+  { href: '/blog',     labelEn: 'Blog',     labelAr: 'المدونة',    Icon: BookOpen,      isRoute: true },
   { href: '/about',    labelEn: 'About',    labelAr: 'من نحن',     Icon: Info,          isRoute: true },
   { href: '/contact',  labelEn: 'Contact',  labelAr: 'تواصل معنا', Icon: MessageCircle, isRoute: true },
-  { href: '/blog',     labelEn: 'Blog',     labelAr: 'المدونة',    Icon: BookOpen,      isRoute: true },
 ];
 
 const SCROLL_SECTION_IDS = ['hero'];
@@ -207,24 +207,24 @@ export default function Navigation() {
   const getLabel = (link: NavLink) => lang === 'ar' ? link.labelAr : link.labelEn;
 
   const linkClass = (active: boolean) =>
-    `relative flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 ${
+    `relative flex items-center gap-2 px-3 py-1.5 text-[13px] font-semibold transition-all duration-200 rounded-full ${
       active
-        ? 'text-[var(--ink)] bg-[var(--bg-2)]'
+        ? 'text-[var(--accent)] bg-[var(--accent-light)]'
         : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)]'
     }`;
 
   const drawerLinkClass = (active: boolean) =>
     `flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-[15px] font-semibold transition-all ${
       active
-        ? 'bg-[var(--accent-light)] text-[var(--accent)]'
+        ? 'bg-[var(--accent)] text-white'
         : 'text-[var(--ink-2)] hover:bg-[var(--bg-2)]'
     }`;
 
   const renderDesktopLink = (link: NavLink) => {
     const active = isActive(link);
     const cls    = linkClass(active);
-    const dot    = active && (
-      <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-[5px] h-[5px] rounded-full bg-[var(--accent)]" />
+    const dot = active && (
+      <span className="w-1 h-1 rounded-full bg-[var(--accent)] shrink-0" />
     );
     if (link.isRoute) {
       return (
@@ -247,7 +247,7 @@ export default function Navigation() {
   const renderDrawerLink = (link: NavLink) => {
     const active = isActive(link);
     const cls    = drawerLinkClass(active);
-    const dot    = active && <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" />;
+    const dot    = active && <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0" />;
     if (link.isRoute) {
       return (
         <Link to={link.href} className={cls} onClick={closeDrawer}>
@@ -275,7 +275,7 @@ export default function Navigation() {
       {/* ── Nav bar ──────────────────────────────────────────────── */}
       <nav
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
-          isScrolled
+          isScrolled || location.pathname !== '/'
             ? `${theme === 'dark' ? 'bg-[rgba(14,13,11,0.96)]' : 'bg-[rgba(248,246,242,0.96)]'} backdrop-blur-xl border-b border-[var(--border)] shadow-sm`
             : 'bg-transparent'
         }`}
