@@ -111,7 +111,7 @@ export default function WhyUs() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="why" className="section bg-[var(--ink)] relative overflow-hidden">
+    <section ref={sectionRef} id="why" className="section dark-section relative overflow-hidden">
       {/* Animated background */}
       <div className="absolute inset-0">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[radial-gradient(circle,rgba(43,92,230,0.12)_0%,transparent_65%)] translate-x-1/3 -translate-y-1/3" />

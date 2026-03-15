@@ -127,7 +127,7 @@ export default function Testimonials() {
         {/* Layout */}
         <div className="testi-layout grid lg:grid-cols-[1.4fr_1fr] gap-5 mb-12">
           {/* Featured Testimonial */}
-          <div className="testi-featured bg-[var(--ink)] rounded-2xl p-8 lg:p-12 flex flex-col justify-between min-h-[480px] relative overflow-hidden">
+          <div className="testi-featured dark-section rounded-2xl p-8 lg:p-12 flex flex-col justify-between min-h-[480px] relative overflow-hidden">
             {/* Quote mark */}
             <div className="absolute top-4 right-8 text-[200px] font-[var(--font-display)] text-[rgba(43,92,230,0.1)] leading-none select-none">
               "

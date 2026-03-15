@@ -23,7 +23,7 @@ function App() {
       {loading && <Preloader onDone={() => setLoading(false)} />}
       <ScrollToTop />
       <CustomCursor />
-      {/* <AnimatedBackground /> */}
+      <AnimatedBackground />
       <Navigation />
       <main className="relative z-10">
         <Routes>

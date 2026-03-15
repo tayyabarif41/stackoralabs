@@ -46,7 +46,7 @@ export default function Marquee() {
   }, []);
 
   return (
-    <section className="bg-[var(--ink)] py-5 overflow-hidden">
+    <section className="dark-section py-5 overflow-hidden">
       {/* First Track - Left to Right */}
       <div className="relative mb-3">
         <div
