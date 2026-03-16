@@ -396,7 +396,7 @@ export default function Navigation() {
 
                       {/* Label */}
                       <span
-                        className={`text-[clamp(26px,7vw,36px)] font-bold leading-none flex-1 transition-colors duration-200 ${
+                        className={`text-[22px] font-bold leading-none flex-1 transition-colors duration-200 ${
                           active ? 'text-[#2B5CE6]' : 'text-white group-hover:text-[#2B5CE6]'
                         }`}
                         style={{ fontFamily: 'var(--font-display)' }}
