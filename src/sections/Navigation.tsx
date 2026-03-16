@@ -397,12 +397,36 @@ export default function Navigation() {
           >
             {/* Drawer header */}
             <div className="flex items-center justify-between px-5 h-[72px] border-b border-[var(--border)] shrink-0">
-              <span className="text-[15px] font-bold tracking-tight text-[var(--ink)]">
-                Stackora<span className="text-[var(--accent)]">Labs</span>
-              </span>
+              {/* Logo */}
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="w-6 h-6 bg-[var(--ink)] rounded-md grid grid-cols-2 gap-[2px] p-[5px]">
+                  <span className="bg-white rounded-[1px]" />
+                  <span className="bg-white/50 rounded-[1px]" />
+                  <span className="bg-white/50 rounded-[1px]" />
+                  <span className="bg-white/20 rounded-[1px]" />
+                </div>
+                <span className="text-[14px] font-bold tracking-tight text-[var(--ink)]">
+                  Stackora<span className="text-[var(--accent)]">Labs</span>
+                </span>
+              </div>
+
+              {/* Right controls */}
               <div className="flex items-center gap-2">
-                {/* Language options inline in drawer */}
-                <div className="flex items-center gap-1 p-1 rounded-lg bg-[var(--bg-2)] border border-[var(--border)]">
+                {/* Dark mode toggle */}
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  aria-label="Toggle dark mode"
+                  className="flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--border)] text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)] transition-colors"
+                >
+                  {theme === 'dark'
+                    ? <Sun  className="w-[14px] h-[14px]" />
+                    : <Moon className="w-[14px] h-[14px]" />
+                  }
+                </button>
+
+                {/* Language toggle pill */}
+                <div className="flex items-center gap-0.5 p-1 rounded-lg bg-[var(--bg-2)] border border-[var(--border)]">
                   {LANGUAGES.map((l) => (
                     <button
                       key={l.code}
@@ -418,11 +442,13 @@ export default function Navigation() {
                     </button>
                   ))}
                 </div>
+
+                {/* Close */}
                 <button
                   type="button"
                   onClick={closeDrawer}
                   aria-label="Close menu"
-                  className="p-2 rounded-lg hover:bg-[var(--bg-2)] transition-colors"
+                  className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-[var(--bg-2)] transition-colors"
                 >
                   <X className="w-5 h-5 text-[var(--ink)]" />
                 </button>
