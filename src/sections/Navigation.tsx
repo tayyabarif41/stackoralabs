@@ -46,8 +46,10 @@ export default function Navigation() {
   const [isLangOpen,    setIsLangOpen]    = useState(false);
   const [isAnimating,   setIsAnimating]   = useState(false);
 
-  const themeButtonRef = useRef<HTMLButtonElement>(null);
-  const iconRef        = useRef<HTMLSpanElement>(null);
+  const themeButtonRef       = useRef<HTMLButtonElement>(null);
+  const iconRef              = useRef<HTMLSpanElement>(null);
+  const mobileThemeButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileIconRef        = useRef<HTMLSpanElement>(null);
   const langDropRef    = useRef<HTMLDivElement>(null);
   const overlayRef     = useRef<HTMLDivElement>(null);
   const dialogRef      = useRef<HTMLDivElement>(null);
@@ -156,13 +158,10 @@ export default function Navigation() {
     }
   };
 
-  // Desktop dark mode toggle with GSAP
-  const handleThemeToggle = useCallback(() => {
-    if (isAnimating || !iconRef.current || !themeButtonRef.current) return;
+  const runThemeAnimation = useCallback((btn: HTMLButtonElement, icon: HTMLSpanElement) => {
+    if (isAnimating) return;
     setIsAnimating(true);
-    const btn  = themeButtonRef.current;
-    const icon = iconRef.current;
-    const tl   = gsap.timeline({ onComplete: () => setIsAnimating(false) });
+    const tl = gsap.timeline({ onComplete: () => setIsAnimating(false) });
     tl.to(btn,  { scale: 0.88, duration: 0.12, ease: 'power2.in' })
       .to(icon, { scale: 0, rotate: 180, duration: 0.18, ease: 'power2.in' }, '<')
       .call(toggleTheme)
@@ -179,6 +178,16 @@ export default function Navigation() {
         '-=0.4'
       );
   }, [isAnimating, toggleTheme]);
+
+  const handleThemeToggle = useCallback(() => {
+    if (!themeButtonRef.current || !iconRef.current) return;
+    runThemeAnimation(themeButtonRef.current, iconRef.current);
+  }, [runThemeAnimation]);
+
+  const handleMobileThemeToggle = useCallback(() => {
+    if (!mobileThemeButtonRef.current || !mobileIconRef.current) return;
+    runThemeAnimation(mobileThemeButtonRef.current, mobileIconRef.current);
+  }, [runThemeAnimation]);
 
   const isActive = (link: NavLink): boolean => {
     if (link.isRoute) {
@@ -271,14 +280,17 @@ export default function Navigation() {
                 </span>
               </button>
 
-              {/* Dark mode — mobile/tablet (simple, always visible) */}
+              {/* Dark mode — mobile/tablet */}
               <button
+                ref={mobileThemeButtonRef}
                 type="button"
-                onClick={toggleTheme}
+                onClick={handleMobileThemeToggle}
                 aria-label="Toggle dark mode"
-                className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--border)] text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)] transition-colors duration-200"
+                className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--border)] text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)] transition-colors duration-200 will-change-transform"
               >
-                {theme === 'dark' ? <Sun className="w-[14px] h-[14px]" /> : <Moon className="w-[14px] h-[14px]" />}
+                <span ref={mobileIconRef} className="flex items-center justify-center will-change-transform">
+                  {theme === 'dark' ? <Sun className="w-[14px] h-[14px]" /> : <Moon className="w-[14px] h-[14px]" />}
+                </span>
               </button>
 
               {/* Language dropdown — all screen sizes */}
