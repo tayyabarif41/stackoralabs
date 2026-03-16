@@ -14,6 +14,7 @@ import WorkPage from './pages/WorkPage';
 import ContactPage from './pages/ContactPage';
 import BlogList from './pages/BlogList';
 import BlogPost from './pages/BlogPost';
+import NotFound from './pages/NotFound';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -34,6 +35,7 @@ function App() {
           <Route path="/contact"    element={<ContactPage />} />
           <Route path="/blog"       element={<BlogList />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="*"           element={<NotFound />} />
         </Routes>
       </main>
       <Footer />
