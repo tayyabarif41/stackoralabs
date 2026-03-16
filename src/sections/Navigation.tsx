@@ -52,7 +52,6 @@ export default function Navigation() {
   const mobileIconRef        = useRef<HTMLSpanElement>(null);
   const langDropRef    = useRef<HTMLDivElement>(null);
   const overlayRef     = useRef<HTMLDivElement>(null);
-  const dialogRef      = useRef<HTMLDivElement>(null);
 
   // Scroll detection
   useEffect(() => {
@@ -99,34 +98,21 @@ export default function Navigation() {
   useEffect(() => {
     if (!isMobileOpen) return;
     const overlay = overlayRef.current;
-    const dialog  = dialogRef.current;
-    if (!overlay || !dialog) return;
+    if (!overlay) return;
 
     const tl = gsap.timeline();
 
-    // Background fades in
     tl.fromTo(overlay,
       { opacity: 0 },
-      { opacity: 1, duration: 0.3, ease: 'power2.out' }
+      { opacity: 1, duration: 0.25, ease: 'power2.out' }
     );
-
-    // Dialog scales + fades in
-    tl.fromTo(dialog,
-      { opacity: 0, scale: 0.95, y: 20 },
-      { opacity: 1, scale: 1, y: 0, duration: 0.35, ease: 'power3.out' },
-      '-=0.15'
-    );
-
-    // Links stagger up
     tl.fromTo('.nav-dialog-item',
-      { opacity: 0, y: 32 },
-      { opacity: 1, y: 0, duration: 0.45, stagger: 0.07, ease: 'power3.out' },
-      '-=0.2'
+      { x: -28, opacity: 0 },
+      { x: 0, opacity: 1, duration: 0.4, stagger: 0.065, ease: 'power3.out' },
+      '-=0.05'
     );
-
-    // Footer fades in
     tl.fromTo('.nav-dialog-footer',
-      { opacity: 0, y: 12 },
+      { opacity: 0, y: 10 },
       { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' },
       '-=0.2'
     );
@@ -134,13 +120,12 @@ export default function Navigation() {
 
   const closeDialog = () => {
     const overlay = overlayRef.current;
-    const dialog  = dialogRef.current;
-    if (!overlay || !dialog) { setIsMobileOpen(false); return; }
+    if (!overlay) { setIsMobileOpen(false); return; }
 
     const tl = gsap.timeline({ onComplete: () => setIsMobileOpen(false) });
-    tl.to('.nav-dialog-item', { opacity: 0, y: -16, duration: 0.2, stagger: 0.03, ease: 'power2.in' });
-    tl.to(dialog,  { opacity: 0, scale: 0.96, y: -12, duration: 0.25, ease: 'power2.in' }, '-=0.1');
-    tl.to(overlay, { opacity: 0, duration: 0.2, ease: 'power2.in' }, '-=0.15');
+    tl.to('.nav-dialog-item',   { x: -20, opacity: 0, duration: 0.18, stagger: 0.03, ease: 'power2.in' });
+    tl.to('.nav-dialog-footer', { opacity: 0, duration: 0.15 }, '<');
+    tl.to(overlay, { opacity: 0, duration: 0.2, ease: 'power2.in' }, '-=0.05');
   };
 
   const scrollToAnchor = (hash: string) => {
@@ -354,80 +339,96 @@ export default function Navigation() {
 
       {/* ── Full-screen nav dialog ───────────────────────────────── */}
       {isMobileOpen && (
-        <div ref={overlayRef} className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-md">
-
-          {/* Dialog panel */}
+        <div
+          ref={overlayRef}
+          className="fixed inset-0 z-[60] flex flex-col"
+          style={{ background: '#0E0D0B' }}
+        >
+          {/* Subtle background glow */}
           <div
-            ref={dialogRef}
-            className="absolute inset-4 sm:inset-8 rounded-2xl overflow-hidden flex flex-col"
-            style={{ background: theme === 'dark' ? '#0E0D0B' : '#F8F6F2' }}
-          >
+            className="absolute top-0 right-0 w-[340px] h-[340px] pointer-events-none"
+            style={{ background: 'radial-gradient(circle, rgba(43,92,230,0.12) 0%, transparent 70%)' }}
+          />
 
-            {/* Dialog header */}
-            <div className="flex items-center justify-between px-6 h-[68px] border-b border-[var(--border)] shrink-0">
-              <span className="text-[15px] font-bold tracking-tight text-[var(--ink)]">
-                Stackora<span className="text-[var(--accent)]">Labs</span>
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 h-[72px] shrink-0 border-b border-white/[0.06]">
+            <div className="flex items-center gap-2.5">
+              <div className="w-6 h-6 bg-white rounded-md grid grid-cols-2 gap-[2px] p-[5px]">
+                <span className="bg-[#0E0D0B] rounded-[1px]" />
+                <span className="bg-[#0E0D0B]/50 rounded-[1px]" />
+                <span className="bg-[#0E0D0B]/50 rounded-[1px]" />
+                <span className="bg-[#0E0D0B]/20 rounded-[1px]" />
+              </div>
+              <span className="text-[14px] font-bold tracking-tight text-white">
+                Stackora<span className="text-[#2B5CE6]">Labs</span>
               </span>
-              <button
-                type="button"
-                onClick={closeDialog}
-                aria-label="Close menu"
-                className="flex items-center justify-center w-9 h-9 rounded-xl border border-[var(--border)] text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)] transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
             </div>
+            <button
+              type="button"
+              onClick={closeDialog}
+              aria-label="Close menu"
+              className="flex items-center justify-center w-9 h-9 rounded-xl border border-white/10 text-white/50 hover:text-white hover:border-white/20 hover:bg-white/5 transition-all"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
 
-            {/* Nav links */}
-            <div className="flex-1 overflow-y-auto flex flex-col justify-center px-6 py-8">
-              <ul className="space-y-1">
-                {NAV_LINKS.map((link) => {
-                  const active = isActive(link);
-                  const handleClick = () => {
-                    if (link.isRoute) {
-                      closeDialog();
-                    } else {
-                      closeDialog();
-                      handleScrollLink(link.href, true);
-                    }
-                  };
-                  return (
-                    <li key={link.href} className="nav-dialog-item">
-                      <Link
-                        to={link.isRoute ? link.href : '/'}
-                        onClick={handleClick}
-                        className={`group flex items-center gap-4 px-5 py-4 rounded-xl transition-all duration-200 ${
-                          active
-                            ? 'bg-[var(--accent)] text-white'
-                            : 'text-[var(--ink)] hover:bg-[var(--bg-2)]'
+          {/* Nav links */}
+          <div className="flex-1 overflow-y-auto flex flex-col justify-center px-6">
+            <ul>
+              {NAV_LINKS.map((link, i) => {
+                const active = isActive(link);
+                const handleClick = () => {
+                  if (link.isRoute) closeDialog();
+                  else { closeDialog(); handleScrollLink(link.href, true); }
+                };
+                return (
+                  <li key={link.href} className="nav-dialog-item border-b border-white/[0.06] last:border-0">
+                    <Link
+                      to={link.isRoute ? link.href : '/'}
+                      onClick={handleClick}
+                      className="group flex items-center gap-4 py-4 w-full"
+                    >
+                      {/* Index number */}
+                      <span className="text-[11px] font-mono text-white/20 w-6 shrink-0 group-hover:text-[#2B5CE6] transition-colors">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+
+                      {/* Label */}
+                      <span
+                        className={`text-[clamp(26px,7vw,36px)] font-bold leading-none flex-1 transition-colors duration-200 ${
+                          active ? 'text-[#2B5CE6]' : 'text-white group-hover:text-[#2B5CE6]'
                         }`}
+                        style={{ fontFamily: 'var(--font-display)' }}
                       >
-                        <span className={`flex items-center justify-center w-9 h-9 rounded-lg ${
-                          active ? 'bg-white/20' : 'bg-[var(--bg-2)] group-hover:bg-[var(--bg-3)]'
-                        } transition-colors`}>
-                          <link.Icon className={`w-[18px] h-[18px] ${active ? 'text-white' : 'text-[var(--muted)]'}`} />
-                        </span>
-                        <span className="text-[17px] font-semibold flex-1">{getLabel(link)}</span>
-                        {active && <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0" />}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+                        {getLabel(link)}
+                      </span>
 
-            {/* Dialog footer */}
-            <div className="nav-dialog-footer px-6 pb-6 pt-3 border-t border-[var(--border)] shrink-0">
-              <Link
-                to="/contact"
-                onClick={closeDialog}
-                className="btn btn-accent w-full justify-center py-3.5 text-[13px]"
-              >
-                {t(tx.cta)}
-              </Link>
-              <p className="text-center text-[11px] text-[var(--muted-2)] mt-3">{t(tx.email)}</p>
-            </div>
+                      {/* Arrow */}
+                      <span className={`text-[18px] transition-all duration-200 ${
+                        active
+                          ? 'text-[#2B5CE6] translate-x-0'
+                          : 'text-white/20 -translate-x-2 group-hover:translate-x-0 group-hover:text-[#2B5CE6]'
+                      }`}>
+                        →
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
 
+          {/* Footer */}
+          <div className="nav-dialog-footer px-6 pb-8 pt-5 border-t border-white/[0.06] shrink-0">
+            <Link
+              to="/contact"
+              onClick={closeDialog}
+              className="flex items-center justify-center w-full py-3.5 rounded-xl bg-[#2B5CE6] text-white text-[13px] font-semibold hover:bg-[#2450cc] transition-colors"
+            >
+              {t(tx.cta)}
+            </Link>
+            <p className="text-center text-[11px] text-white/25 mt-3">{t(tx.email)}</p>
           </div>
         </div>
       )}
