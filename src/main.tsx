@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { CookieProvider } from './context/CookieContext';
@@ -12,9 +12,9 @@ createRoot(document.getElementById('root')!).render(
     <ThemeProvider>
       <LanguageProvider>
         <CookieProvider>
-          <BrowserRouter basename="/stackoralabs">
+          <HashRouter>
             <App />
-          </BrowserRouter>
+          </HashRouter>
         </CookieProvider>
       </LanguageProvider>
     </ThemeProvider>

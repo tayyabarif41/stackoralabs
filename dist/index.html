@@ -1,32 +1,29 @@
 <!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StackoraLabs</title>
-  <script>
-    (function () {
-      // Restore path from GitHub Pages 404 redirect
-      var redirect = sessionStorage.getItem('gh-pages-redirect');
-      if (redirect) {
-        sessionStorage.removeItem('gh-pages-redirect');
-        var url = new URL(redirect, window.location.origin);
-        window.history.replaceState(null, '', url.pathname + url.search + url.hash);
-      }
-      // Restore theme
-      var saved = localStorage.getItem('stackora-theme');
-      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      var theme = saved || (prefersDark ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', theme);
-    })();
-  </script>
-  <script type="module" crossorigin src="/stackoralabs/assets/index-D6kGr6aW.js"></script>
-  <link rel="stylesheet" crossorigin href="/stackoralabs/assets/index-n4mQfC9x.css">
-</head>
-
-<body>
-  <div id="root"></div>
-</body>
-
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StackoraLabs</title>
+    <script>
+      (function() {
+        // Restore path from GitHub Pages 404 redirect
+        var redirect = sessionStorage.getItem('gh-pages-redirect');
+        if (redirect) {
+          sessionStorage.removeItem('gh-pages-redirect');
+          var url = new URL(redirect, window.location.origin);
+          window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+        }
+        // Restore theme
+        var saved = localStorage.getItem('stackora-theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = saved || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+    <script type="module" crossorigin src="/stackoralabs/assets/index-Ck-DT8gH.js"></script>
+    <link rel="stylesheet" crossorigin href="/stackoralabs/assets/index-n4mQfC9x.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>
