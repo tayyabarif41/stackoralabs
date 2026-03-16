@@ -28,15 +28,15 @@ const NAV_LINKS: NavLink[] = [
 const SCROLL_SECTION_IDS = ['hero'];
 
 const LANGUAGES = [
-  { code: 'en' as const, label: 'English',  native: 'English'  },
-  { code: 'ar' as const, label: 'Arabic',   native: 'العربية'  },
+  { code: 'en' as const, label: 'English', native: 'English' },
+  { code: 'ar' as const, label: 'Arabic',  native: 'العربية' },
 ];
 
 export default function Navigation() {
-  const { lang, setLang }       = useLanguage();
-  const { theme, toggleTheme }  = useTheme();
-  const t   = useT(lang);
-  const tx  = translations.nav;
+  const { lang, setLang }      = useLanguage();
+  const { theme, toggleTheme } = useTheme();
+  const t  = useT(lang);
+  const tx = translations.nav;
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -46,20 +46,20 @@ export default function Navigation() {
   const [isLangOpen,    setIsLangOpen]    = useState(false);
   const [isAnimating,   setIsAnimating]   = useState(false);
 
-  const drawerRef      = useRef<HTMLDivElement>(null);
-  const backdropRef    = useRef<HTMLDivElement>(null);
   const themeButtonRef = useRef<HTMLButtonElement>(null);
   const iconRef        = useRef<HTMLSpanElement>(null);
   const langDropRef    = useRef<HTMLDivElement>(null);
+  const overlayRef     = useRef<HTMLDivElement>(null);
+  const dialogRef      = useRef<HTMLDivElement>(null);
 
-  // scroll detection
+  // Scroll detection
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // active section
+  // Active section
   useEffect(() => {
     if (location.pathname !== '/') return;
     const observers: IntersectionObserver[] = [];
@@ -76,57 +76,69 @@ export default function Navigation() {
     return () => observers.forEach((obs) => obs.disconnect());
   }, [location.pathname]);
 
-  // body scroll lock
+  // Body scroll lock
   useEffect(() => {
     document.body.style.overflow = isMobileOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isMobileOpen]);
 
-  // close lang dropdown on outside click
+  // Close lang dropdown on outside click
   useEffect(() => {
     if (!isLangOpen) return;
     const handler = (e: MouseEvent) => {
-      if (langDropRef.current && !langDropRef.current.contains(e.target as Node)) {
+      if (langDropRef.current && !langDropRef.current.contains(e.target as Node))
         setIsLangOpen(false);
-      }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [isLangOpen]);
 
-  // drawer open animation
+  // Dialog open animation
   useEffect(() => {
     if (!isMobileOpen) return;
-    const slideFrom = lang === 'ar' ? '-100%' : '100%';
-    if (backdropRef.current) {
-      gsap.fromTo(backdropRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.25, ease: 'power2.out' }
-      );
-    }
-    if (drawerRef.current) {
-      gsap.fromTo(drawerRef.current,
-        { x: slideFrom },
-        { x: '0%', duration: 0.4, ease: 'power3.out' }
-      );
-    }
-    gsap.fromTo('.drawer-link',
-      { opacity: 0, y: 12 },
-      { opacity: 1, y: 0, duration: 0.3, stagger: 0.055, delay: 0.18, ease: 'power2.out' }
-    );
-  }, [isMobileOpen, lang]);
+    const overlay = overlayRef.current;
+    const dialog  = dialogRef.current;
+    if (!overlay || !dialog) return;
 
-  const closeDrawer = () => {
-    const slideTo = lang === 'ar' ? '-100%' : '100%';
-    if (backdropRef.current) gsap.to(backdropRef.current, { opacity: 0, duration: 0.2 });
-    if (drawerRef.current) {
-      gsap.to(drawerRef.current, {
-        x: slideTo, duration: 0.32, ease: 'power3.in',
-        onComplete: () => setIsMobileOpen(false),
-      });
-    } else {
-      setIsMobileOpen(false);
-    }
+    const tl = gsap.timeline();
+
+    // Background fades in
+    tl.fromTo(overlay,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.3, ease: 'power2.out' }
+    );
+
+    // Dialog scales + fades in
+    tl.fromTo(dialog,
+      { opacity: 0, scale: 0.95, y: 20 },
+      { opacity: 1, scale: 1, y: 0, duration: 0.35, ease: 'power3.out' },
+      '-=0.15'
+    );
+
+    // Links stagger up
+    tl.fromTo('.nav-dialog-item',
+      { opacity: 0, y: 32 },
+      { opacity: 1, y: 0, duration: 0.45, stagger: 0.07, ease: 'power3.out' },
+      '-=0.2'
+    );
+
+    // Footer fades in
+    tl.fromTo('.nav-dialog-footer',
+      { opacity: 0, y: 12 },
+      { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' },
+      '-=0.2'
+    );
+  }, [isMobileOpen]);
+
+  const closeDialog = () => {
+    const overlay = overlayRef.current;
+    const dialog  = dialogRef.current;
+    if (!overlay || !dialog) { setIsMobileOpen(false); return; }
+
+    const tl = gsap.timeline({ onComplete: () => setIsMobileOpen(false) });
+    tl.to('.nav-dialog-item', { opacity: 0, y: -16, duration: 0.2, stagger: 0.03, ease: 'power2.in' });
+    tl.to(dialog,  { opacity: 0, scale: 0.96, y: -12, duration: 0.25, ease: 'power2.in' }, '-=0.1');
+    tl.to(overlay, { opacity: 0, duration: 0.2, ease: 'power2.in' }, '-=0.15');
   };
 
   const scrollToAnchor = (hash: string) => {
@@ -144,56 +156,28 @@ export default function Navigation() {
     }
   };
 
-  // ── Dark mode toggle with GSAP animation ──────────────────────
+  // Desktop dark mode toggle with GSAP
   const handleThemeToggle = useCallback(() => {
     if (isAnimating || !iconRef.current || !themeButtonRef.current) return;
     setIsAnimating(true);
-
     const btn  = themeButtonRef.current;
     const icon = iconRef.current;
-    const tl   = gsap.timeline({
-      onComplete: () => setIsAnimating(false),
-    });
-
-    // 1. Button background pulse
-    tl.to(btn, {
-      scale: 0.88,
-      duration: 0.12,
-      ease: 'power2.in',
-    })
-    // 2. Icon shrinks + spins out
-    .to(icon, {
-      scale: 0,
-      rotate: 180,
-      duration: 0.18,
-      ease: 'power2.in',
-    }, '<')
-    // 3. Switch theme mid-animation
-    .call(toggleTheme)
-    // 4. Button bounces back + glows
-    .to(btn, {
-      scale: 1.12,
-      duration: 0.2,
-      ease: 'back.out(3)',
-    })
-    .to(btn, {
-      scale: 1,
-      duration: 0.15,
-      ease: 'power2.out',
-    })
-    // 5. New icon spins in
-    .fromTo(icon,
-      { scale: 0, rotate: -180 },
-      { scale: 1, rotate: 0, duration: 0.28, ease: 'back.out(2.5)' },
-      '<-0.1'
-    )
-    // 6. Subtle glow pulse on the button
-    .fromTo(btn,
-      { boxShadow: '0 0 0px 0px rgba(43,92,230,0.5)' },
-      { boxShadow: '0 0 0px 0px rgba(43,92,230,0)', duration: 0.5,
-        ease: 'power2.out', clearProps: 'boxShadow' },
-      '-=0.4'
-    );
+    const tl   = gsap.timeline({ onComplete: () => setIsAnimating(false) });
+    tl.to(btn,  { scale: 0.88, duration: 0.12, ease: 'power2.in' })
+      .to(icon, { scale: 0, rotate: 180, duration: 0.18, ease: 'power2.in' }, '<')
+      .call(toggleTheme)
+      .to(btn,  { scale: 1.12, duration: 0.2, ease: 'back.out(3)' })
+      .to(btn,  { scale: 1, duration: 0.15, ease: 'power2.out' })
+      .fromTo(icon,
+        { scale: 0, rotate: -180 },
+        { scale: 1, rotate: 0, duration: 0.28, ease: 'back.out(2.5)' },
+        '<-0.1'
+      )
+      .fromTo(btn,
+        { boxShadow: '0 0 0px 0px rgba(43,92,230,0.5)' },
+        { boxShadow: '0 0 0px 0px rgba(43,92,230,0)', duration: 0.5, ease: 'power2.out', clearProps: 'boxShadow' },
+        '-=0.4'
+      );
   }, [isAnimating, toggleTheme]);
 
   const isActive = (link: NavLink): boolean => {
@@ -213,19 +197,10 @@ export default function Navigation() {
         : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)]'
     }`;
 
-  const drawerLinkClass = (active: boolean) =>
-    `flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-[15px] font-semibold transition-all ${
-      active
-        ? 'bg-[var(--accent)] text-white'
-        : 'text-[var(--ink-2)] hover:bg-[var(--bg-2)]'
-    }`;
-
   const renderDesktopLink = (link: NavLink) => {
     const active = isActive(link);
     const cls    = linkClass(active);
-    const dot = active && (
-      <span className="w-1 h-1 rounded-full bg-[var(--accent)] shrink-0" />
-    );
+    const dot    = active && <span className="w-1 h-1 rounded-full bg-[var(--accent)] shrink-0" />;
     if (link.isRoute) {
       return (
         <Link to={link.href} className={cls}>
@@ -244,29 +219,6 @@ export default function Navigation() {
     );
   };
 
-  const renderDrawerLink = (link: NavLink) => {
-    const active = isActive(link);
-    const cls    = drawerLinkClass(active);
-    const dot    = active && <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0" />;
-    if (link.isRoute) {
-      return (
-        <Link to={link.href} className={cls} onClick={closeDrawer}>
-          <link.Icon className="w-[18px] h-[18px] opacity-60 shrink-0" />
-          <span className="flex-1">{getLabel(link)}</span>
-          {dot}
-        </Link>
-      );
-    }
-    return (
-      <a href={link.href} onClick={(e) => { e.preventDefault(); closeDrawer(); handleScrollLink(link.href, true); }} className={cls}>
-        <link.Icon className="w-[18px] h-[18px] opacity-60 shrink-0" />
-        <span className="flex-1">{getLabel(link)}</span>
-        {dot}
-      </a>
-    );
-  };
-
-  // Current language label
   const currentLang = LANGUAGES.find((l) => l.code === lang)!;
 
   return (
@@ -306,38 +258,58 @@ export default function Navigation() {
             {/* Right controls */}
             <div className="flex items-center gap-2 shrink-0">
 
-              {/* ── Dark mode toggle ─────────────────────── */}
+              {/* Dark mode — desktop (with GSAP animation) */}
               <button
                 ref={themeButtonRef}
                 type="button"
                 onClick={handleThemeToggle}
                 aria-label="Toggle dark mode"
-                className="hidden sm:flex items-center justify-center w-9 h-9 rounded-lg border border-[var(--border)] text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)] hover:border-[var(--border-2)] transition-colors duration-200 will-change-transform"
+                className="hidden lg:flex items-center justify-center w-9 h-9 rounded-lg border border-[var(--border)] text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)] hover:border-[var(--border-2)] transition-colors duration-200 will-change-transform"
               >
                 <span ref={iconRef} className="flex items-center justify-center will-change-transform">
-                  {theme === 'dark'
-                    ? <Sun  className="w-[15px] h-[15px]" />
-                    : <Moon className="w-[15px] h-[15px]" />
-                  }
+                  {theme === 'dark' ? <Sun className="w-[15px] h-[15px]" /> : <Moon className="w-[15px] h-[15px]" />}
                 </span>
               </button>
 
-              {/* ── Language dropdown ────────────────────── */}
-              <div ref={langDropRef} className="relative hidden sm:block">
+              {/* Dark mode — mobile/tablet (simple, always visible) */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                aria-label="Toggle dark mode"
+                className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--border)] text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)] transition-colors duration-200"
+              >
+                {theme === 'dark' ? <Sun className="w-[14px] h-[14px]" /> : <Moon className="w-[14px] h-[14px]" />}
+              </button>
+
+              {/* Language — mobile/tablet pill (always visible, compact) */}
+              <div className="lg:hidden flex items-center gap-0.5 p-0.5 rounded-lg bg-[var(--bg-2)] border border-[var(--border)]">
+                {LANGUAGES.map((l) => (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => setLang(l.code)}
+                    className={`px-2.5 py-1 rounded-md text-[10px] font-bold transition-all duration-200 ${
+                      lang === l.code
+                        ? 'bg-white text-[var(--accent)] shadow-sm'
+                        : 'text-[var(--muted)] hover:text-[var(--ink)]'
+                    }`}
+                  >
+                    {l.code === 'en' ? 'EN' : 'ع'}
+                  </button>
+                ))}
+              </div>
+
+              {/* Language — desktop dropdown */}
+              <div ref={langDropRef} className="relative hidden lg:block">
                 <button
                   type="button"
                   onClick={() => setIsLangOpen((o) => !o)}
-                  aria-label="Select language"
                   aria-expanded={isLangOpen}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[12px] font-semibold text-[var(--muted)] hover:text-[var(--ink)] hover:border-[var(--border-2)] hover:bg-[var(--bg-2)] transition-all duration-200"
                 >
                   <span>{currentLang.native}</span>
-                  <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform duration-200 ${isLangOpen ? 'rotate-180' : ''}`}
-                  />
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isLangOpen ? 'rotate-180' : ''}`} />
                 </button>
-
-                {/* Dropdown panel */}
                 <div
                   className={`absolute top-[calc(100%+8px)] ${lang === 'ar' ? 'left-0' : 'right-0'} min-w-[148px] bg-white border border-[var(--border)] rounded-xl shadow-lg overflow-hidden transition-all duration-200 origin-top ${
                     isLangOpen
@@ -366,17 +338,17 @@ export default function Navigation() {
                 </div>
               </div>
 
-              {/* CTA */}
-              <Link to="/contact" className="hidden sm:inline-flex btn btn-accent text-[11px] py-2.5 px-5">
+              {/* CTA — desktop */}
+              <Link to="/contact" className="hidden lg:inline-flex btn btn-accent text-[11px] py-2.5 px-5">
                 {t(tx.cta)}
               </Link>
 
-              {/* Hamburger */}
+              {/* Hamburger — mobile/tablet */}
               <button
                 type="button"
                 onClick={() => setIsMobileOpen(true)}
                 aria-label="Open menu"
-                className="lg:hidden p-2 rounded-lg hover:bg-[var(--bg-2)] transition-colors"
+                className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg hover:bg-[var(--bg-2)] transition-colors"
               >
                 <Menu className="w-5 h-5 text-[var(--ink)]" />
               </button>
@@ -386,91 +358,82 @@ export default function Navigation() {
         </div>
       </nav>
 
-      {/* ── Mobile drawer ─────────────────────────────────────────── */}
+      {/* ── Full-screen nav dialog ───────────────────────────────── */}
       {isMobileOpen && (
-        <div className="fixed inset-0 z-[60]">
-          <div ref={backdropRef} onClick={closeDrawer} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div ref={overlayRef} className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-md">
 
+          {/* Dialog panel */}
           <div
-            ref={drawerRef}
-            className={`absolute top-0 bottom-0 ${lang === 'ar' ? 'left-0' : 'right-0'} w-[min(88vw,380px)] bg-white flex flex-col shadow-2xl`}
+            ref={dialogRef}
+            className="absolute inset-4 sm:inset-8 rounded-2xl overflow-hidden flex flex-col"
+            style={{ background: theme === 'dark' ? '#0E0D0B' : '#F8F6F2' }}
           >
-            {/* Drawer header */}
-            <div className="flex items-center justify-between px-5 h-[72px] border-b border-[var(--border)] shrink-0">
-              {/* Logo */}
-              <div className="flex items-center gap-2 shrink-0">
-                <div className="w-6 h-6 bg-[var(--ink)] rounded-md grid grid-cols-2 gap-[2px] p-[5px]">
-                  <span className="bg-white rounded-[1px]" />
-                  <span className="bg-white/50 rounded-[1px]" />
-                  <span className="bg-white/50 rounded-[1px]" />
-                  <span className="bg-white/20 rounded-[1px]" />
-                </div>
-                <span className="text-[14px] font-bold tracking-tight text-[var(--ink)]">
-                  Stackora<span className="text-[var(--accent)]">Labs</span>
-                </span>
-              </div>
 
-              {/* Right controls */}
-              <div className="flex items-center gap-2">
-                {/* Dark mode toggle */}
-                <button
-                  type="button"
-                  onClick={toggleTheme}
-                  aria-label="Toggle dark mode"
-                  className="flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--border)] text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)] transition-colors"
-                >
-                  {theme === 'dark'
-                    ? <Sun  className="w-[14px] h-[14px]" />
-                    : <Moon className="w-[14px] h-[14px]" />
-                  }
-                </button>
-
-                {/* Language toggle pill */}
-                <div className="flex items-center gap-0.5 p-1 rounded-lg bg-[var(--bg-2)] border border-[var(--border)]">
-                  {LANGUAGES.map((l) => (
-                    <button
-                      key={l.code}
-                      type="button"
-                      onClick={() => setLang(l.code)}
-                      className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all duration-200 ${
-                        lang === l.code
-                          ? 'bg-white text-[var(--accent)] shadow-sm'
-                          : 'text-[var(--muted)] hover:text-[var(--ink)]'
-                      }`}
-                    >
-                      {l.code === 'en' ? 'EN' : 'ع'}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Close */}
-                <button
-                  type="button"
-                  onClick={closeDrawer}
-                  aria-label="Close menu"
-                  className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-[var(--bg-2)] transition-colors"
-                >
-                  <X className="w-5 h-5 text-[var(--ink)]" />
-                </button>
-              </div>
+            {/* Dialog header */}
+            <div className="flex items-center justify-between px-6 h-[68px] border-b border-[var(--border)] shrink-0">
+              <span className="text-[15px] font-bold tracking-tight text-[var(--ink)]">
+                Stackora<span className="text-[var(--accent)]">Labs</span>
+              </span>
+              <button
+                type="button"
+                onClick={closeDialog}
+                aria-label="Close menu"
+                className="flex items-center justify-center w-9 h-9 rounded-xl border border-[var(--border)] text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)] transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Drawer links */}
-            <div className="flex-1 overflow-y-auto px-3 py-3">
-              <ul className="space-y-0.5">
-                {NAV_LINKS.map((link) => (
-                  <li key={link.href} className="drawer-link">{renderDrawerLink(link)}</li>
-                ))}
+            {/* Nav links */}
+            <div className="flex-1 overflow-y-auto flex flex-col justify-center px-6 py-8">
+              <ul className="space-y-1">
+                {NAV_LINKS.map((link) => {
+                  const active = isActive(link);
+                  const handleClick = () => {
+                    if (link.isRoute) {
+                      closeDialog();
+                    } else {
+                      closeDialog();
+                      handleScrollLink(link.href, true);
+                    }
+                  };
+                  return (
+                    <li key={link.href} className="nav-dialog-item">
+                      <Link
+                        to={link.isRoute ? link.href : '/'}
+                        onClick={handleClick}
+                        className={`group flex items-center gap-4 px-5 py-4 rounded-xl transition-all duration-200 ${
+                          active
+                            ? 'bg-[var(--accent)] text-white'
+                            : 'text-[var(--ink)] hover:bg-[var(--bg-2)]'
+                        }`}
+                      >
+                        <span className={`flex items-center justify-center w-9 h-9 rounded-lg ${
+                          active ? 'bg-white/20' : 'bg-[var(--bg-2)] group-hover:bg-[var(--bg-3)]'
+                        } transition-colors`}>
+                          <link.Icon className={`w-[18px] h-[18px] ${active ? 'text-white' : 'text-[var(--muted)]'}`} />
+                        </span>
+                        <span className="text-[17px] font-semibold flex-1">{getLabel(link)}</span>
+                        {active && <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0" />}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 
-            {/* Drawer footer */}
-            <div className="px-4 pb-6 pt-3 border-t border-[var(--border)] shrink-0">
-              <Link to="/contact" onClick={closeDrawer} className="btn btn-accent w-full justify-center py-3.5 text-[13px]">
+            {/* Dialog footer */}
+            <div className="nav-dialog-footer px-6 pb-6 pt-3 border-t border-[var(--border)] shrink-0">
+              <Link
+                to="/contact"
+                onClick={closeDialog}
+                className="btn btn-accent w-full justify-center py-3.5 text-[13px]"
+              >
                 {t(tx.cta)}
               </Link>
               <p className="text-center text-[11px] text-[var(--muted-2)] mt-3">{t(tx.email)}</p>
             </div>
+
           </div>
         </div>
       )}
