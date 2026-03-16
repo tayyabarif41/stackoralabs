@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import gsap from 'gsap';
 import Navigation from './sections/Navigation';
 import Footer from './sections/Footer';
 import CustomCursor from './components/CustomCursor';
@@ -18,6 +19,17 @@ import NotFound from './pages/NotFound';
 
 function App() {
   const [loading, setLoading] = useState(true);
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!loading && pageRef.current) {
+      gsap.fromTo(
+        pageRef.current,
+        { y: 60, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }
+      );
+    }
+  }, [loading]);
 
   return (
     <div className="relative">
@@ -26,7 +38,7 @@ function App() {
       <CustomCursor />
       <AnimatedBackground />
       <Navigation />
-      <main className="relative z-10">
+      <main ref={pageRef} className="relative z-10" style={loading ? { opacity: 0 } : undefined}>
         <Routes>
           <Route path="/"           element={<Home />} />
           <Route path="/services"   element={<ServicesPage />} />
