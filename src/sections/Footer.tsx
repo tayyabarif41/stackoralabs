@@ -1,28 +1,5 @@
 import { Linkedin, Twitter, Instagram } from 'lucide-react';
-
-const footerLinks = {
-  shopify: [
-    { label: 'Store Development', href: '#services' },
-    { label: 'Shopify Plus', href: '#services' },
-    { label: 'Theme Design', href: '#services' },
-    { label: 'App Development', href: '#services' },
-    { label: 'Migration', href: '#services' },
-  ],
-  services: [
-    { label: 'Custom Ecommerce', href: '#services' },
-    { label: 'CRO & Growth', href: '#services' },
-    { label: 'GCC Payments', href: '#services' },
-    { label: 'Arabic UX', href: '#services' },
-    { label: 'Infrastructure', href: '#services' },
-  ],
-  company: [
-    { label: 'Our Work', href: '#cases' },
-    { label: 'Our Process', href: '#process' },
-    { label: 'Pricing', href: '#pricing' },
-    { label: 'Contact', href: '#contact' },
-    { label: 'Privacy Policy', href: '#' },
-  ],
-};
+import { useLanguage } from '@/context/LanguageContext';
 
 const socialLinks = [
   { icon: Linkedin, href: '#', label: 'LinkedIn' },
@@ -31,6 +8,32 @@ const socialLinks = [
 ];
 
 export default function Footer() {
+  const { t } = useLanguage();
+
+  const footerLinks = {
+    shopify: [
+      { en: 'Store Development',  ar: 'تطوير المتاجر',           href: '#services' },
+      { en: 'Shopify Plus',       ar: 'Shopify Plus',             href: '#services' },
+      { en: 'Theme Design',       ar: 'تصميم القوالب',           href: '#services' },
+      { en: 'App Development',    ar: 'تطوير التطبيقات',         href: '#services' },
+      { en: 'Migration',          ar: 'الترحيل',                  href: '#services' },
+    ],
+    services: [
+      { en: 'Custom Ecommerce',   ar: 'تجارة إلكترونية مخصصة',  href: '#services' },
+      { en: 'CRO & Growth',       ar: 'تحسين التحويل والنمو',    href: '#services' },
+      { en: 'GCC Payments',       ar: 'مدفوعات الخليج',          href: '#services' },
+      { en: 'Arabic UX',          ar: 'تجربة المستخدم العربية',  href: '#services' },
+      { en: 'Infrastructure',     ar: 'البنية التحتية',           href: '#services' },
+    ],
+    company: [
+      { en: 'Our Work',           ar: 'أعمالنا',                 href: '#cases' },
+      { en: 'Our Process',        ar: 'منهجيتنا',                href: '#process' },
+      { en: 'Pricing',            ar: 'الأسعار',                 href: '#pricing' },
+      { en: 'Contact',            ar: 'تواصل معنا',              href: '#contact' },
+      { en: 'Privacy Policy',     ar: 'سياسة الخصوصية',         href: '#' },
+    ],
+  };
+
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href === '#') return;
     e.preventDefault();
@@ -61,8 +64,10 @@ export default function Footer() {
               </span>
             </a>
             <p className="text-[12px] text-[var(--muted)] leading-relaxed max-w-[240px] mb-6">
-              GCC's premier ecommerce engineering partner. Headquartered in Dubai. 
-              Serving UAE, Saudi Arabia, Qatar and Kuwait.
+              {t(
+                "GCC's premier ecommerce engineering partner. Headquartered in Dubai. Serving UAE, Saudi Arabia, Qatar and Kuwait.",
+                'شريك هندسة التجارة الإلكترونية الرائد في الخليج. مقرنا في دبي. نخدم الإمارات والسعودية وقطر والكويت.'
+              )}
             </p>
             <div className="flex gap-4">
               {socialLinks.map((social, index) => (
@@ -91,7 +96,7 @@ export default function Footer() {
                     onClick={(e) => handleScrollTo(e, link.href)}
                     className="text-[12px] text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
                   >
-                    {link.label}
+                    {t(link.en, link.ar)}
                   </a>
                 </li>
               ))}
@@ -101,7 +106,7 @@ export default function Footer() {
           {/* Services Links */}
           <div>
             <div className="text-[10px] font-bold tracking-[0.14em] uppercase text-[var(--muted-2)] mb-4">
-              Services
+              {t('Services', 'الخدمات')}
             </div>
             <ul className="space-y-2.5">
               {footerLinks.services.map((link, index) => (
@@ -111,7 +116,7 @@ export default function Footer() {
                     onClick={(e) => handleScrollTo(e, link.href)}
                     className="text-[12px] text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
                   >
-                    {link.label}
+                    {t(link.en, link.ar)}
                   </a>
                 </li>
               ))}
@@ -121,7 +126,7 @@ export default function Footer() {
           {/* Company Links */}
           <div>
             <div className="text-[10px] font-bold tracking-[0.14em] uppercase text-[var(--muted-2)] mb-4">
-              Company
+              {t('Company', 'الشركة')}
             </div>
             <ul className="space-y-2.5">
               {footerLinks.company.map((link, index) => (
@@ -131,7 +136,7 @@ export default function Footer() {
                     onClick={(e) => handleScrollTo(e, link.href)}
                     className="text-[12px] text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
                   >
-                    {link.label}
+                    {t(link.en, link.ar)}
                   </a>
                 </li>
               ))}
@@ -142,12 +147,12 @@ export default function Footer() {
         {/* Bottom Section */}
         <div className="pt-8 border-t border-[var(--border)] flex flex-col md:flex-row items-center justify-between gap-4">
           <span className="text-[11px] text-[var(--muted-2)]">
-            © 2025 StackoraLabs FZ-LLC. All rights reserved. Dubai, UAE.
+            {t('© 2025 StackoraLabs FZ-LLC. All rights reserved. Dubai, UAE.', '© ٢٠٢٥ StackoraLabs FZ-LLC. جميع الحقوق محفوظة. دبي، الإمارات.')}
           </span>
-          
+
           <div className="flex items-center gap-2 text-[11px] text-[var(--muted-2)]">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-            <span>Shopify Partner · AWS Partner · Google Partner</span>
+            <span>{t('Shopify Partner · AWS Partner · Google Partner', 'شريك Shopify · شريك AWS · شريك Google')}</span>
           </div>
         </div>
       </div>

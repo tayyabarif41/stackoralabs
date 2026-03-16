@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
+import { useLanguage } from '@/context/LanguageContext';
 
 import Contact from '@/sections/Contact';
 import CTABand from '@/sections/CTABand';
 
 export default function ContactPage() {
+  const { t } = useLanguage();
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,36 +41,34 @@ export default function ContactPage() {
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-white/40 text-[12px] font-medium tracking-wider uppercase mb-6">
             <Link to="/" className="hover:text-white/70 transition-colors">
-              Home
+              {t('Home', 'الرئيسية')}
             </Link>
             <span className="opacity-50">/</span>
-            <span className="text-white/60">Contact</span>
+            <span className="text-white/60">{t('Contact', 'تواصل معنا')}</span>
           </div>
 
           <div className="page-hero-content max-w-3xl">
-            {/* Tag */}
             <div className="flex items-center gap-2 mb-5">
               <span className="w-4 h-px bg-[var(--accent)]" />
               <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--accent)]">
-                Get In Touch
+                {t('Get In Touch', 'تواصل معنا')}
               </span>
             </div>
 
-            {/* Heading */}
             <h1
               className="text-[clamp(40px,6vw,80px)] font-bold text-white leading-[0.95] mb-5"
               style={{ fontFamily: 'var(--font-display)' }}
             >
-              Let's Build Something
+              {t("Let's Build Something", 'لنبني شيئاً')}
               <br />
-              <span className="gradient-text">Exceptional.</span>
+              <span className="gradient-text">{t('Exceptional.', 'استثنائياً.')}</span>
             </h1>
 
-            {/* Subheading */}
             <p className="text-white/50 text-[17px] leading-relaxed max-w-xl">
-              Tell us about your brand and your project. We'll be in touch
-              within the same business day with a clear next step — no sales
-              pitch, no obligation.
+              {t(
+                "Tell us about your brand and your project. We'll be in touch within the same business day with a clear next step — no sales pitch, no obligation.",
+                'أخبرنا عن علامتك التجارية ومشروعك. سنتواصل معك في نفس يوم العمل بخطوة واضحة تالية — بلا عرض بيع، بلا التزامات.'
+              )}
             </p>
           </div>
         </div>

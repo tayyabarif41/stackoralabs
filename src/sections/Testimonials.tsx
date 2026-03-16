@@ -2,43 +2,53 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Star } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const featuredTestimonial = {
-  quote: "StackoraLabs didn't just build our store. They understood what it means to sell to a GCC customer — the expectations, the trust signals, the payment preferences. No other agency came close.",
-  author: 'Sara Al-Mansouri',
-  role: 'CEO, LUMÉ Collective — Dubai',
-  rating: 5,
-};
-
-const miniTestimonials = [
-  {
-    quote: "We had a Magento store costing us 40% in abandoned carts. StackoraLabs migrated us to Shopify Plus in 8 weeks with zero data loss. Checkout abandonment dropped from 71% to 38%.",
-    author: 'Khalid Al-Harbi',
-    role: 'Founder, TERRA KSA — Riyadh',
-    rating: 5,
-  },
-  {
-    quote: "The Next.js headless build achieved 1.4s load times. The 3D product viewer they built became our biggest differentiator. We're now on monthly retainer.",
-    author: 'James Whitfield',
-    role: 'CTO, FORMA Home — Abu Dhabi',
-    rating: 5,
-  },
-];
-
-const ratings = [
-  { score: '5.0', platform: 'Google Reviews' },
-  { score: '4.9', platform: 'Clutch.co' },
-  { score: '97%', platform: 'Client Retention', subtext: 'across 180+ projects' },
-];
-
 export default function Testimonials() {
+  const { t } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
+
+  const featuredTestimonial = {
+    quote: t(
+      "StackoraLabs didn't just build our store. They understood what it means to sell to a GCC customer — the expectations, the trust signals, the payment preferences. No other agency came close.",
+      'لم تقتصر Stackora Labs على بناء متجرنا. بل فهمت ما يعنيه البيع لعميل خليجي — التوقعات وإشارات الثقة وتفضيلات الدفع. لم تقترب منهم أي وكالة أخرى.'
+    ),
+    author: t('Sara Al-Mansouri', 'سارة المنصوري'),
+    role: t('CEO, LUMÉ Collective — Dubai', 'الرئيسة التنفيذية، LUMÉ Collective — دبي'),
+    rating: 5,
+  };
+
+  const miniTestimonials = [
+    {
+      quote: t(
+        'We had a Magento store costing us 40% in abandoned carts. StackoraLabs migrated us to Shopify Plus in 8 weeks with zero data loss. Checkout abandonment dropped from 71% to 38%.',
+        'كان لدينا متجر Magento يكلفنا ٤٠٪ من عربات التسوق المهجورة. نقلتنا Stackora Labs إلى Shopify Plus في ٨ أسابيع بدون فقد بيانات. انخفض التخلي عند الدفع من ٧١٪ إلى ٣٨٪.'
+      ),
+      author: t('Khalid Al-Harbi', 'خالد الحربي'),
+      role: t('Founder, TERRA KSA — Riyadh', 'مؤسس، TERRA KSA — الرياض'),
+      rating: 5,
+    },
+    {
+      quote: t(
+        'The Next.js headless build achieved 1.4s load times. The 3D product viewer they built became our biggest differentiator. We\'re now on monthly retainer.',
+        'حقق بناء Next.js headless أوقات تحميل ١.٤ ثانية. أصبح عارض المنتج ثلاثي الأبعاد الذي بنوه أكبر ميزة تنافسية لنا. نحن الآن في عقد شهري.'
+      ),
+      author: t('James Whitfield', 'جيمس ويتفيلد'),
+      role: t('CTO, FORMA Home — Abu Dhabi', 'المدير التقني، FORMA Home — أبوظبي'),
+      rating: 5,
+    },
+  ];
+
+  const ratings = [
+    { score: '5.0', platformEn: 'Google Reviews',  platformAr: 'تقييمات Google' },
+    { score: '4.9', platformEn: 'Clutch.co',        platformAr: 'Clutch.co' },
+    { score: '97%', platformEn: 'Client Retention', platformAr: 'استبقاء العملاء', subtextEn: 'across 180+ projects', subtextAr: 'عبر أكثر من ١٨٠ مشروع' },
+  ];
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Header animation
       gsap.fromTo('.testi-header',
         { opacity: 0, y: 30 },
         {
@@ -54,7 +64,6 @@ export default function Testimonials() {
         }
       );
 
-      // Featured card
       gsap.fromTo('.testi-featured',
         { opacity: 0, x: -30 },
         {
@@ -70,7 +79,6 @@ export default function Testimonials() {
         }
       );
 
-      // Mini cards
       gsap.fromTo('.testi-mini',
         { opacity: 0, x: 30 },
         {
@@ -87,7 +95,6 @@ export default function Testimonials() {
         }
       );
 
-      // Rating bar
       gsap.fromTo('.testi-ratings',
         { opacity: 0, y: 20 },
         {
@@ -113,14 +120,17 @@ export default function Testimonials() {
         {/* Header */}
         <div className="testi-header flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
           <div>
-            <div className="tag mb-4">Client Voices</div>
+            <div className="tag mb-4">{t('Client Voices', 'آراء العملاء')}</div>
             <h2 className="text-[clamp(40px,5vw,66px)] font-[var(--font-display)] font-semibold leading-[0.95]">
-              Trusted Across<br />
-              <span className="text-[var(--accent)]">the GCC.</span>
+              {t('Trusted Across', 'موثوق به عبر')}<br />
+              <span className="text-[var(--accent)]">{t('the GCC.', 'منطقة الخليج.')}</span>
             </h2>
           </div>
           <p className="text-[14px] text-[var(--muted)] leading-relaxed max-w-[320px]">
-            Real results from real brands across UAE, Saudi Arabia and the wider Gulf region.
+            {t(
+              'Real results from real brands across UAE, Saudi Arabia and the wider Gulf region.',
+              'نتائج حقيقية من علامات تجارية حقيقية في الإمارات والمملكة العربية السعودية ومنطقة الخليج الأوسع.'
+            )}
           </p>
         </div>
 
@@ -128,26 +138,22 @@ export default function Testimonials() {
         <div className="testi-layout grid lg:grid-cols-[1.4fr_1fr] gap-5 mb-12">
           {/* Featured Testimonial */}
           <div className="testi-featured dark-section rounded-2xl p-8 lg:p-12 flex flex-col justify-between min-h-[480px] relative overflow-hidden">
-            {/* Quote mark */}
             <div className="absolute top-4 right-8 text-[200px] font-[var(--font-display)] text-[rgba(43,92,230,0.1)] leading-none select-none">
               "
             </div>
-            
+
             <div className="relative z-10">
-              {/* Stars */}
               <div className="flex gap-1 mb-8">
                 {[...Array(featuredTestimonial.rating)].map((_, i) => (
                   <Star key={i} className="w-5 h-5 fill-[#F5C518] text-[#F5C518]" />
                 ))}
               </div>
-              
-              {/* Quote */}
+
               <blockquote className="text-[clamp(18px,2.2vw,26px)] font-[var(--font-display)] text-white leading-relaxed italic mb-10">
                 "{featuredTestimonial.quote}"
               </blockquote>
             </div>
-            
-            {/* Author */}
+
             <div className="relative z-10 flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-[var(--accent)] flex items-center justify-center text-white text-lg font-semibold border-2 border-white/15">
                 🇦🇪
@@ -166,26 +172,22 @@ export default function Testimonials() {
                 key={index}
                 className="testi-mini bg-white border border-[var(--border)] rounded-xl p-6 lg:p-7 flex-1 flex flex-col justify-between card-hover relative overflow-hidden"
               >
-                {/* Quote mark */}
                 <div className="absolute top-2 right-5 text-[80px] font-[var(--font-display)] text-[var(--accent-light)] leading-none select-none">
                   "
                 </div>
-                
+
                 <div className="relative z-10">
-                  {/* Stars */}
                   <div className="flex gap-0.5 mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star key={i} className="w-4 h-4 fill-[var(--gold)] text-[var(--gold)]" />
                     ))}
                   </div>
-                  
-                  {/* Quote */}
+
                   <blockquote className="text-[13px] text-[var(--muted)] leading-relaxed italic mb-6">
                     "{testimonial.quote}"
                   </blockquote>
                 </div>
-                
-                {/* Author */}
+
                 <div className="relative z-10 flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-[var(--bg-2)] flex items-center justify-center text-[var(--ink)] text-sm font-semibold border border-[var(--border)]">
                     {index === 0 ? '🇸🇦' : '🇦🇪'}
@@ -216,10 +218,10 @@ export default function Testimonials() {
                   </div>
                 )}
                 <div className="text-[11px] text-[var(--muted)]">
-                  {rating.platform}
+                  {t(rating.platformEn, rating.platformAr)}
                 </div>
-                {rating.subtext && (
-                  <div className="text-[10px] text-[var(--muted-2)]">{rating.subtext}</div>
+                {rating.subtextEn && (
+                  <div className="text-[10px] text-[var(--muted-2)]">{t(rating.subtextEn, rating.subtextAr!)}</div>
                 )}
               </div>
               {index < ratings.length - 1 && (

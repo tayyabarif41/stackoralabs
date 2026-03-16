@@ -6,13 +6,16 @@ import {
 } from 'lucide-react';
 import { useCookies } from '@/context/CookieContext';
 import type { CookiePreferences } from '@/context/CookieContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 /* ── Cookie category definitions ──────────────────────────────── */
 interface Category {
   key: keyof Omit<CookiePreferences, 'necessary'>;
   Icon: React.ElementType;
-  label: string;
-  description: string;
+  labelEn: string;
+  labelAr: string;
+  descEn: string;
+  descAr: string;
   examples: string;
   required?: false;
 }
@@ -21,29 +24,37 @@ const CATEGORIES: Category[] = [
   {
     key: 'analytics',
     Icon: BarChart2,
-    label: 'Analytics',
-    description: 'Help us understand how visitors interact with our website by collecting and reporting information anonymously.',
+    labelEn: 'Analytics',
+    labelAr: 'التحليلات',
+    descEn: 'Help us understand how visitors interact with our website by collecting and reporting information anonymously.',
+    descAr: 'تساعدنا على فهم كيفية تفاعل الزوار مع موقعنا من خلال جمع المعلومات والإبلاغ عنها بشكل مجهول.',
     examples: 'Google Analytics, Hotjar, Mixpanel',
   },
   {
     key: 'marketing',
     Icon: Megaphone,
-    label: 'Marketing',
-    description: 'Used to track visitors across websites to display relevant and engaging advertisements.',
+    labelEn: 'Marketing',
+    labelAr: 'التسويق',
+    descEn: 'Used to track visitors across websites to display relevant and engaging advertisements.',
+    descAr: 'تُستخدم لتتبع الزوار عبر المواقع لعرض إعلانات ذات صلة وجذابة.',
     examples: 'Meta Pixel, Google Ads, LinkedIn Insight',
   },
   {
     key: 'functional',
     Icon: Sliders,
-    label: 'Functional',
-    description: 'Enable enhanced functionality and personalisation such as live chat, language preferences, and saved settings.',
+    labelEn: 'Functional',
+    labelAr: 'وظيفية',
+    descEn: 'Enable enhanced functionality and personalisation such as live chat, language preferences, and saved settings.',
+    descAr: 'تتيح وظائف محسّنة وتخصيصاً مثل الدردشة المباشرة وتفضيلات اللغة والإعدادات المحفوظة.',
     examples: 'Intercom, Crisp, language memory',
   },
   {
     key: 'performance',
     Icon: Zap,
-    label: 'Performance',
-    description: 'Allow us to count visits and traffic sources to measure and improve site performance.',
+    labelEn: 'Performance',
+    labelAr: 'الأداء',
+    descEn: 'Allow us to count visits and traffic sources to measure and improve site performance.',
+    descAr: 'تتيح لنا إحصاء الزيارات ومصادر الزيارات لقياس أداء الموقع وتحسينه.',
     examples: 'Cloudflare Insights, Web Vitals',
   },
 ];
@@ -87,10 +98,12 @@ function CategoryRow({
   category,
   enabled,
   onChange,
+  tFn,
 }: {
   category: Category;
   enabled: boolean;
   onChange: (v: boolean) => void;
+  tFn: (en: string, ar: string) => string;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -101,7 +114,7 @@ function CategoryRow({
         <div className="w-8 h-8 rounded-lg bg-[var(--accent-light)] flex items-center justify-center shrink-0">
           <category.Icon className="w-4 h-4 text-[var(--accent)]" />
         </div>
-        <span className="flex-1 text-[var(--ink)] font-semibold text-[13px]">{category.label}</span>
+        <span className="flex-1 text-[var(--ink)] font-semibold text-[13px]">{tFn(category.labelEn, category.labelAr)}</span>
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
@@ -120,10 +133,10 @@ function CategoryRow({
       {open && (
         <div className="px-4 pb-4 border-t border-[var(--border)] bg-[var(--bg-2)]">
           <p className="text-[var(--muted)] text-[12px] leading-relaxed mt-3 mb-2">
-            {category.description}
+            {tFn(category.descEn, category.descAr)}
           </p>
           <p className="text-[var(--muted-2)] text-[11px]">
-            <span className="font-medium text-[var(--muted)]">Examples: </span>
+            <span className="font-medium text-[var(--muted)]">{tFn('Examples: ', 'أمثلة: ')}</span>
             {category.examples}
           </p>
         </div>
@@ -135,6 +148,7 @@ function CategoryRow({
 /* ── Main component ────────────────────────────────────────────── */
 export default function CookieConsent() {
   const { status, preferences, acceptAll, rejectAll, saveCustom } = useCookies();
+  const { t } = useLanguage();
   const [view, setView] = useState<'banner' | 'settings'>('banner');
   const [custom, setCustom] = useState({
     analytics: preferences.analytics,
@@ -191,10 +205,12 @@ export default function CookieConsent() {
               <Cookie className="w-4 h-4 text-[var(--accent)]" />
             </div>
             <div className="min-w-0">
-              <p className="text-[var(--ink)] font-semibold text-[13px] mb-0.5">We use cookies</p>
+              <p className="text-[var(--ink)] font-semibold text-[13px] mb-0.5">{t('We use cookies', 'نستخدم ملفات تعريف الارتباط')}</p>
               <p className="text-[var(--muted)] text-[12px] leading-relaxed">
-                We use cookies to enhance your experience, analyse traffic, and serve personalised content.
-                You can manage your preferences at any time.
+                {t(
+                  'We use cookies to enhance your experience, analyse traffic, and serve personalised content. You can manage your preferences at any time.',
+                  'نستخدم ملفات تعريف الارتباط لتحسين تجربتك وتحليل الزيارات وتقديم محتوى مخصص. يمكنك إدارة تفضيلاتك في أي وقت.'
+                )}
               </p>
             </div>
           </div>
@@ -207,14 +223,14 @@ export default function CookieConsent() {
               className="px-3 py-2 rounded-xl text-[12px] font-semibold text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)] transition-colors border border-[var(--border)] flex items-center gap-1.5"
             >
               <Sliders className="w-3.5 h-3.5" />
-              Manage
+              {t('Manage', 'إدارة')}
             </button>
             <button
               type="button"
               onClick={() => animateOut(rejectAll)}
               className="px-3 py-2 rounded-xl text-[12px] font-semibold text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)] transition-colors border border-[var(--border)]"
             >
-              Reject all
+              {t('Reject all', 'رفض الكل')}
             </button>
             <button
               type="button"
@@ -222,7 +238,7 @@ export default function CookieConsent() {
               className="px-4 py-2 rounded-xl text-[12px] font-semibold bg-[var(--accent)] text-white hover:bg-[var(--accent-2)] transition-colors flex items-center gap-1.5"
             >
               <Check className="w-3.5 h-3.5" />
-              Accept all
+              {t('Accept all', 'قبول الكل')}
             </button>
           </div>
         </div>
@@ -245,8 +261,8 @@ export default function CookieConsent() {
             <Shield className="w-4 h-4 text-[var(--accent)]" />
           </div>
           <div className="flex-1">
-            <h2 className="text-[var(--ink)] font-semibold text-[15px]">Cookie Preferences</h2>
-            <p className="text-[var(--muted)] text-[11px]">Control what data we collect</p>
+            <h2 className="text-[var(--ink)] font-semibold text-[15px]">{t('Cookie Preferences', 'تفضيلات ملفات الارتباط')}</h2>
+            <p className="text-[var(--muted)] text-[11px]">{t('Control what data we collect', 'تحكم في البيانات التي نجمعها')}</p>
           </div>
           <button
             type="button"
@@ -267,20 +283,20 @@ export default function CookieConsent() {
                 <Shield className="w-4 h-4 text-[var(--accent)]" />
               </div>
               <div className="flex-1">
-                <span className="text-[var(--ink)] font-semibold text-[13px]">Necessary</span>
+                <span className="text-[var(--ink)] font-semibold text-[13px]">{t('Necessary', 'ضرورية')}</span>
                 <span className="ml-2 text-[10px] font-medium text-[var(--accent)] bg-[var(--accent-light)] px-2 py-0.5 rounded-full">
-                  Always on
+                  {t('Always on', 'دائماً مفعّلة')}
                 </span>
               </div>
               <Toggle checked={true} onChange={() => {}} disabled />
             </div>
             <div className="px-4 pb-3 border-t border-[var(--border)] bg-[var(--bg-2)]">
               <p className="text-[var(--muted)] text-[12px] leading-relaxed mt-3 mb-2">
-                Essential for the website to function. They cannot be switched off.
+                {t('Essential for the website to function. They cannot be switched off.', 'ضرورية لعمل الموقع. لا يمكن إيقافها.')}
               </p>
               <p className="text-[var(--muted-2)] text-[11px]">
-                <span className="font-medium text-[var(--muted)]">Examples: </span>
-                Session cookies, CSRF protection, authentication tokens
+                <span className="font-medium text-[var(--muted)]">{t('Examples: ', 'أمثلة: ')}</span>
+                {t('Session cookies, CSRF protection, authentication tokens', 'ملفات الجلسة، حماية CSRF، رموز المصادقة')}
               </p>
             </div>
           </div>
@@ -292,6 +308,7 @@ export default function CookieConsent() {
               category={cat}
               enabled={custom[cat.key]}
               onChange={(v) => setCustom((p) => ({ ...p, [cat.key]: v }))}
+              tFn={t}
             />
           ))}
 
@@ -299,8 +316,10 @@ export default function CookieConsent() {
           <div className="flex gap-2 p-3 rounded-xl bg-[var(--bg-2)] border border-[var(--border)]">
             <Info className="w-4 h-4 text-[var(--muted)] shrink-0 mt-0.5" />
             <p className="text-[var(--muted)] text-[11px] leading-relaxed">
-              Your preferences are stored locally and can be updated at any time via our cookie settings.
-              We never sell your personal data.
+              {t(
+                'Your preferences are stored locally and can be updated at any time via our cookie settings. We never sell your personal data.',
+                'تُخزَّن تفضيلاتك محلياً ويمكن تحديثها في أي وقت عبر إعدادات ملفات الارتباط. لا نبيع بياناتك الشخصية أبداً.'
+              )}
             </p>
           </div>
         </div>
@@ -312,7 +331,7 @@ export default function CookieConsent() {
             onClick={() => animateOut(rejectAll)}
             className="px-4 py-2 rounded-xl text-[12px] font-semibold text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-2)] transition-colors border border-[var(--border)]"
           >
-            Reject all
+            {t('Reject all', 'رفض الكل')}
           </button>
           <div className="flex-1" />
           <button
@@ -320,7 +339,7 @@ export default function CookieConsent() {
             onClick={() => animateOut(() => saveCustom(custom))}
             className="px-4 py-2 rounded-xl text-[12px] font-semibold border border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent-light)] transition-colors"
           >
-            Save preferences
+            {t('Save preferences', 'حفظ التفضيلات')}
           </button>
           <button
             type="button"
@@ -328,7 +347,7 @@ export default function CookieConsent() {
             className="px-4 py-2 rounded-xl text-[12px] font-semibold bg-[var(--accent)] text-white hover:bg-[var(--accent-2)] transition-colors flex items-center gap-1.5"
           >
             <Check className="w-3.5 h-3.5" />
-            Accept all
+            {t('Accept all', 'قبول الكل')}
           </button>
         </div>
       </div>

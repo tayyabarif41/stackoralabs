@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
+import { useLanguage } from '@/context/LanguageContext';
 import Cases from '@/sections/Cases';
 import CTABand from '@/sections/CTABand';
 
 export default function WorkPage() {
+  const { t } = useLanguage();
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,19 +31,21 @@ export default function WorkPage() {
           <div className="page-hero-content max-w-3xl">
             <div className="flex items-center gap-3 mb-6">
               <Link to="/" className="text-white/40 hover:text-white/70 text-[12px] font-semibold uppercase tracking-wider transition-colors">
-                Home
+                {t('Home', 'الرئيسية')}
               </Link>
               <span className="text-white/20">/</span>
-              <span className="text-white/60 text-[12px] font-semibold uppercase tracking-wider">Work</span>
+              <span className="text-white/60 text-[12px] font-semibold uppercase tracking-wider">{t('Work', 'أعمالنا')}</span>
             </div>
-            <span className="tag mb-6 !text-white/50 before:!bg-white/30">Our Work</span>
+            <span className="tag mb-6 !text-white/50 before:!bg-white/30">{t('Our Work', 'أعمالنا')}</span>
             <h1 className="text-[clamp(44px,7vw,88px)] font-[var(--font-display)] font-semibold leading-[0.9] text-white mb-6">
-              GCC Brands<br />
-              <span className="text-[var(--accent)]">We've Scaled.</span>
+              {t('GCC Brands', 'علامات خليجية')}<br />
+              <span className="text-[var(--accent)]">{t("We've Scaled.", 'نجحنا في تنميتها.')}</span>
             </h1>
             <p className="text-white/50 text-[17px] leading-relaxed max-w-xl">
-              Real results for real brands across Saudi Arabia, UAE, Kuwait, and Qatar.
-              Every build engineered for performance, conversion, and growth.
+              {t(
+                'Real results for real brands across Saudi Arabia, UAE, Kuwait, and Qatar. Every build engineered for performance, conversion, and growth.',
+                'نتائج حقيقية لعلامات تجارية حقيقية في السعودية والإمارات والكويت وقطر. كل بناء مهندس للأداء والتحويل والنمو.'
+              )}
             </p>
           </div>
         </div>

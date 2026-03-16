@@ -2,78 +2,39 @@ import { useState, useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Mail, MapPin, Globe, Calendar, Check, Loader2, ArrowRight } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const contactInfo = [
-  {
-    label: 'Email',
-    value: 'hello@stackoralabs.com',
-    subtext: 'Same business day response',
-    icon: Mail,
-  },
-  {
-    label: 'Headquarters',
-    value: 'Dubai, UAE',
-    subtext: 'DIFC · Business Bay',
-    icon: MapPin,
-  },
-  {
-    label: 'Coverage',
-    value: 'UAE · KSA · Qatar · Kuwait',
-    subtext: 'Remote-first, on-site available',
-    icon: Globe,
-  },
-  {
-    label: 'Availability',
-    value: 'Booking Q3 2025',
-    subtext: '2 project slots remaining',
-    icon: Calendar,
-  },
-];
-
-const serviceOptions = [
-  'Shopify Development',
-  'Shopify Plus',
-  'CRO & Optimisation',
-  'Custom Ecommerce',
-  'Migration',
-  'ERP / API Integration',
-  'Retainer / Ongoing',
-  'Not sure yet',
-];
-
-const budgetOptions = [
-  '$5,000 – $10,000',
-  '$10,000 – $25,000',
-  '$25,000 – $50,000',
-  '$50,000 – $100,000',
-  '$100,000+',
-  'Not sure yet',
-];
-
-const countryOptions = [
-  'UAE',
-  'Saudi Arabia',
-  'Qatar',
-  'Kuwait',
-  'Bahrain',
-  'Oman',
-  'Other',
-];
-
-const platformOptions = [
-  'Shopify',
-  'Shopify Plus',
-  'WooCommerce',
-  'Magento',
-  'Salla',
-  'Zid',
-  'Custom / Other',
-  'Starting from scratch',
-];
-
 export default function Contact() {
+  const { t } = useLanguage();
+
+  const contactInfo = [
+    {
+      labelEn: 'Email',           labelAr: 'البريد الإلكتروني',
+      value: 'hello@stackoralabs.com',
+      subtextEn: 'Same business day response', subtextAr: 'رد في نفس يوم العمل',
+      icon: Mail,
+    },
+    {
+      labelEn: 'Headquarters',    labelAr: 'المقر الرئيسي',
+      valueEn: 'Dubai, UAE',      valueAr: 'دبي، الإمارات',
+      subtextEn: 'DIFC · Business Bay', subtextAr: 'مركز دبي المالي الدولي · بيزنس باي',
+      icon: MapPin,
+    },
+    {
+      labelEn: 'Coverage',        labelAr: 'نطاق العمل',
+      valueEn: 'UAE · KSA · Qatar · Kuwait', valueAr: 'الإمارات · السعودية · قطر · الكويت',
+      subtextEn: 'Remote-first, on-site available', subtextAr: 'عن بُعد أولاً، حضور ميداني متاح',
+      icon: Globe,
+    },
+    {
+      labelEn: 'Availability',    labelAr: 'التوفر',
+      valueEn: 'Booking Q3 2025', valueAr: 'الحجز للربع الثالث ٢٠٢٥',
+      subtextEn: '2 project slots remaining', subtextAr: 'خانتان لمشاريع متبقيتان',
+      icon: Calendar,
+    },
+  ];
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -132,25 +93,25 @@ export default function Contact() {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim() || formData.name.length < 2) {
-      newErrors.name = 'Please enter your name';
+      newErrors.name = t('Please enter your name', 'يرجى إدخال اسمك');
     }
     if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
+      newErrors.email = t('Please enter a valid email', 'يرجى إدخال بريد إلكتروني صحيح');
     }
     if (!formData.company.trim()) {
-      newErrors.company = 'Please enter your company';
+      newErrors.company = t('Please enter your company', 'يرجى إدخال اسم شركتك');
     }
     if (!formData.country) {
-      newErrors.country = 'Please select your country';
+      newErrors.country = t('Please select your country', 'يرجى اختيار دولتك');
     }
     if (!formData.service) {
-      newErrors.service = 'Please select a service';
+      newErrors.service = t('Please select a service', 'يرجى اختيار الخدمة');
     }
     if (!formData.budget) {
-      newErrors.budget = 'Please select a budget';
+      newErrors.budget = t('Please select a budget', 'يرجى اختيار الميزانية');
     }
     if (!formData.message.trim() || formData.message.length < 20) {
-      newErrors.message = 'Please write at least 20 characters';
+      newErrors.message = t('Please write at least 20 characters', 'يرجى كتابة ٢٠ حرفاً على الأقل');
     }
 
     setErrors(newErrors);
@@ -202,14 +163,16 @@ export default function Contact() {
         <div className="grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-20">
           {/* Left Content */}
           <div className="contact-content">
-            <div className="tag mb-6">Start a Project</div>
+            <div className="tag mb-6">{t('Start a Project', 'ابدأ مشروعك')}</div>
             <h2 className="text-[clamp(36px,4.5vw,58px)] font-[var(--font-display)] font-semibold leading-[0.95] mb-4">
-              Let's Build Your GCC<br />
-              <span className="text-[var(--accent)]">Commerce Engine.</span>
+              {t("Let's Build Your GCC", 'لنبني محرك التجارة')}<br />
+              <span className="text-[var(--accent)]">{t('Commerce Engine.', 'الخليجي الخاص بك.')}</span>
             </h2>
             <p className="text-[14px] text-[var(--muted)] leading-relaxed mb-10">
-              Book a free 30-minute strategy session. We'll review your store, identify revenue
-              opportunities and propose a scope — at no cost and no obligation.
+              {t(
+                "Book a free 30-minute strategy session. We'll review your store, identify revenue opportunities and propose a scope — at no cost and no obligation.",
+                'احجز جلسة استراتيجية مجانية لمدة ٣٠ دقيقة. سنراجع متجرك ونحدد فرص الإيرادات ونقترح نطاقاً — بدون تكلفة أو التزام.'
+              )}
             </p>
 
             {/* Contact Info */}
@@ -220,13 +183,15 @@ export default function Contact() {
                   className="py-5 border-b border-[var(--border)] first:border-t"
                 >
                   <div className="text-[9px] font-bold tracking-[0.14em] uppercase text-[var(--muted-2)] mb-1">
-                    {item.label}
+                    {t(item.labelEn, item.labelAr)}
                   </div>
                   <div className="flex items-start gap-3">
                     <item.icon className="w-4 h-4 text-[var(--accent)] mt-0.5 flex-shrink-0" />
                     <div>
-                      <div className="text-[14px] font-semibold text-[var(--ink)]">{item.value}</div>
-                      <div className="text-[11px] text-[var(--muted)]">{item.subtext}</div>
+                      <div className="text-[14px] font-semibold text-[var(--ink)]">
+                        {item.value ?? t(item.valueEn!, item.valueAr!)}
+                      </div>
+                      <div className="text-[11px] text-[var(--muted)]">{t(item.subtextEn, item.subtextAr)}</div>
                     </div>
                   </div>
                 </div>
@@ -243,10 +208,10 @@ export default function Contact() {
                     <Check className="w-7 h-7 text-green-600" />
                   </div>
                   <h3 className="text-[24px] font-[var(--font-display)] font-semibold mb-2">
-                    Message received.
+                    {t('Message received.', 'تم استلام رسالتك.')}
                   </h3>
                   <p className="text-[13px] text-[var(--muted)]">
-                    Our team will be in touch within the same business day.
+                    {t('Our team will be in touch within the same business day.', 'سيتواصل معك فريقنا في نفس يوم العمل.')}
                   </p>
                 </div>
               ) : (
@@ -255,13 +220,13 @@ export default function Contact() {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-[var(--muted)] block mb-2">
-                        Full Name
+                        {t('Full Name', 'الاسم الكامل')}
                       </label>
                       <input
                         type="text"
                         value={formData.name}
                         onChange={(e) => handleChange('name', e.target.value)}
-                        placeholder="Khalid Al-Rashid"
+                        placeholder={t('Khalid Al-Rashid', 'خالد الراشد')}
                         className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted-2)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] ${errors.name ? 'border-red-400' : 'border-[var(--border)]'
                           }`}
                       />
@@ -271,7 +236,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-[var(--muted)] block mb-2">
-                        Email Address
+                        {t('Email Address', 'عنوان البريد الإلكتروني')}
                       </label>
                       <input
                         type="email"
@@ -291,13 +256,13 @@ export default function Contact() {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-[var(--muted)] block mb-2">
-                        Company / Brand
+                        {t('Company / Brand', 'الشركة / العلامة التجارية')}
                       </label>
                       <input
                         type="text"
                         value={formData.company}
                         onChange={(e) => handleChange('company', e.target.value)}
-                        placeholder="Your Brand LLC"
+                        placeholder={t('Your Brand LLC', 'شركتك المحدودة')}
                         className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted-2)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] ${errors.company ? 'border-red-400' : 'border-[var(--border)]'
                           }`}
                       />
@@ -307,7 +272,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-[var(--muted)] block mb-2">
-                        Country
+                        {t('Country', 'الدولة')}
                       </label>
                       <select
                         value={formData.country}
@@ -320,9 +285,17 @@ export default function Contact() {
                           backgroundPosition: 'right 14px center',
                         }}
                       >
-                        <option value="">Select country…</option>
-                        {countryOptions.map((opt) => (
-                          <option key={opt} value={opt}>{opt}</option>
+                        <option value="">{t('Select country…', 'اختر الدولة…')}</option>
+                        {[
+                          { en: 'UAE', ar: 'الإمارات' },
+                          { en: 'Saudi Arabia', ar: 'المملكة العربية السعودية' },
+                          { en: 'Qatar', ar: 'قطر' },
+                          { en: 'Kuwait', ar: 'الكويت' },
+                          { en: 'Bahrain', ar: 'البحرين' },
+                          { en: 'Oman', ar: 'عُمان' },
+                          { en: 'Other', ar: 'أخرى' },
+                        ].map((opt) => (
+                          <option key={opt.en} value={opt.en}>{t(opt.en, opt.ar)}</option>
                         ))}
                       </select>
                       {errors.country && (
@@ -335,7 +308,7 @@ export default function Contact() {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-[var(--muted)] block mb-2">
-                        Service Needed
+                        {t('Service Needed', 'الخدمة المطلوبة')}
                       </label>
                       <select
                         value={formData.service}
@@ -348,9 +321,18 @@ export default function Contact() {
                           backgroundPosition: 'right 14px center',
                         }}
                       >
-                        <option value="">Select service…</option>
-                        {serviceOptions.map((opt) => (
-                          <option key={opt} value={opt}>{opt}</option>
+                        <option value="">{t('Select service…', 'اختر الخدمة…')}</option>
+                        {[
+                          { en: 'Shopify Development',   ar: 'تطوير Shopify' },
+                          { en: 'Shopify Plus',          ar: 'Shopify Plus' },
+                          { en: 'CRO & Optimisation',    ar: 'تحسين التحويل' },
+                          { en: 'Custom Ecommerce',      ar: 'تجارة إلكترونية مخصصة' },
+                          { en: 'Migration',             ar: 'الترحيل' },
+                          { en: 'ERP / API Integration', ar: 'تكامل ERP / API' },
+                          { en: 'Retainer / Ongoing',    ar: 'عقد مستمر' },
+                          { en: 'Not sure yet',          ar: 'لم أقرر بعد' },
+                        ].map((opt) => (
+                          <option key={opt.en} value={opt.en}>{t(opt.en, opt.ar)}</option>
                         ))}
                       </select>
                       {errors.service && (
@@ -359,7 +341,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-[var(--muted)] block mb-2">
-                        Budget (USD)
+                        {t('Budget (USD)', 'الميزانية (دولار)')}
                       </label>
                       <select
                         value={formData.budget}
@@ -372,9 +354,16 @@ export default function Contact() {
                           backgroundPosition: 'right 14px center',
                         }}
                       >
-                        <option value="">Select budget…</option>
-                        {budgetOptions.map((opt) => (
-                          <option key={opt} value={opt}>{opt}</option>
+                        <option value="">{t('Select budget…', 'اختر الميزانية…')}</option>
+                        {[
+                          { en: '$5,000 – $10,000',    ar: '٥,٠٠٠ – ١٠,٠٠٠ $' },
+                          { en: '$10,000 – $25,000',   ar: '١٠,٠٠٠ – ٢٥,٠٠٠ $' },
+                          { en: '$25,000 – $50,000',   ar: '٢٥,٠٠٠ – ٥٠,٠٠٠ $' },
+                          { en: '$50,000 – $100,000',  ar: '٥٠,٠٠٠ – ١٠٠,٠٠٠ $' },
+                          { en: '$100,000+',            ar: '+١٠٠,٠٠٠ $' },
+                          { en: 'Not sure yet',         ar: 'لم أقرر بعد' },
+                        ].map((opt) => (
+                          <option key={opt.en} value={opt.en}>{t(opt.en, opt.ar)}</option>
                         ))}
                       </select>
                       {errors.budget && (
@@ -386,7 +375,7 @@ export default function Contact() {
                   {/* Platform */}
                   <div>
                     <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-[var(--muted)] block mb-2">
-                      Current Platform
+                      {t('Current Platform', 'المنصة الحالية')}
                     </label>
                     <select
                       value={formData.platform}
@@ -398,9 +387,18 @@ export default function Contact() {
                         backgroundPosition: 'right 14px center',
                       }}
                     >
-                      <option value="">Select platform…</option>
-                      {platformOptions.map((opt) => (
-                        <option key={opt} value={opt}>{opt}</option>
+                      <option value="">{t('Select platform…', 'اختر المنصة…')}</option>
+                      {[
+                        { en: 'Shopify',             ar: 'Shopify' },
+                        { en: 'Shopify Plus',        ar: 'Shopify Plus' },
+                        { en: 'WooCommerce',         ar: 'WooCommerce' },
+                        { en: 'Magento',             ar: 'Magento' },
+                        { en: 'Salla',               ar: 'سلة' },
+                        { en: 'Zid',                 ar: 'زد' },
+                        { en: 'Custom / Other',      ar: 'مخصص / أخرى' },
+                        { en: 'Starting from scratch', ar: 'البدء من الصفر' },
+                      ].map((opt) => (
+                        <option key={opt.en} value={opt.en}>{t(opt.en, opt.ar)}</option>
                       ))}
                     </select>
                   </div>
@@ -408,12 +406,15 @@ export default function Contact() {
                   {/* Message */}
                   <div>
                     <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-[var(--muted)] block mb-2">
-                      Project Brief
+                      {t('Project Brief', 'ملخص المشروع')}
                     </label>
                     <textarea
                       value={formData.message}
                       onChange={(e) => handleChange('message', e.target.value)}
-                      placeholder="Tell us about your brand, your current store, pain points and what success looks like…"
+                      placeholder={t(
+                        'Tell us about your brand, your current store, pain points and what success looks like…',
+                        'أخبرنا عن علامتك التجارية ومتجرك الحالي ونقاط الألم وكيف يبدو النجاح بالنسبة لك…'
+                      )}
                       rows={4}
                       className={`w-full bg-[var(--bg)] border rounded-lg px-4 py-3 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted-2)] transition-all focus:outline-none focus:border-[var(--accent)] focus:bg-white focus:ring-2 focus:ring-[var(--accent-light)] resize-none ${errors.message ? 'border-red-400' : 'border-[var(--border)]'
                         }`}
@@ -437,18 +438,18 @@ export default function Contact() {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Sending...
+                        {t('Sending...', 'جارٍ الإرسال...')}
                       </>
                     ) : (
                       <>
-                        Book Free Strategy Session
+                        {t('Book Free Strategy Session', 'احجز جلسة استراتيجية مجانية')}
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}
                   </button>
 
                   <p className="text-[10px] text-[var(--muted-2)] text-center">
-                    No sales pitch. No commitment. Just a strategic conversation.
+                    {t('No sales pitch. No commitment. Just a strategic conversation.', 'بلا عروض بيع. بلا التزامات. مجرد محادثة استراتيجية.')}
                   </p>
                 </form>
               )}

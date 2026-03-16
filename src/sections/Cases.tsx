@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
 import { ArrowRight, TrendingUp, Users, ShoppingBag, Star } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,10 +15,10 @@ const caseStudies = [
     category: 'Fashion E-commerce · UAE & KSA',
     description: 'The Middle East\'s leading online fashion retailer with 1.2M+ active customers. We helped optimize their Shopify Plus architecture for peak traffic events, resulting in 30% sales growth during promotional periods.',
     metrics: [
-      { value: '$231M', label: 'Annual Sales', icon: TrendingUp },
-      { value: '1.2M+', label: 'Active Customers', icon: Users },
-      { value: '700+', label: 'Brands', icon: ShoppingBag },
-      { value: '30%', label: 'Sales Growth', icon: Star },
+      { value: '$231M', labelEn: 'Annual Sales',      labelAr: 'مبيعات سنوية',      icon: TrendingUp },
+      { value: '1.2M+', labelEn: 'Active Customers',  labelAr: 'عميل نشط',           icon: Users },
+      { value: '700+',  labelEn: 'Brands',            labelAr: 'علامة تجارية',       icon: ShoppingBag },
+      { value: '30%',   labelEn: 'Sales Growth',      labelAr: 'نمو المبيعات',       icon: Star },
     ],
     tags: ['Shopify Plus', 'Performance', 'Arabic UX', 'CRO'],
     featured: true,
@@ -32,10 +33,10 @@ const caseStudies = [
     category: 'Eyewear · UAE & Saudi Arabia',
     description: 'The region\'s fastest-growing eyewear retailer with 200+ stores. Built a headless commerce platform enabling 50%+ YoY revenue growth and seamless omnichannel experience.',
     metrics: [
-      { value: '$100M', label: 'Series C Raised', icon: TrendingUp },
-      { value: '200+', label: 'Stores', icon: ShoppingBag },
-      { value: '50%', label: 'YoY Growth', icon: Star },
-      { value: '1,300', label: 'Employees', icon: Users },
+      { value: '$100M', labelEn: 'Series C Raised', labelAr: 'جولة C',          icon: TrendingUp },
+      { value: '200+',  labelEn: 'Stores',           labelAr: 'متجر',            icon: ShoppingBag },
+      { value: '50%',   labelEn: 'YoY Growth',       labelAr: 'نمو سنوي',        icon: Star },
+      { value: '1,300', labelEn: 'Employees',        labelAr: 'موظف',            icon: Users },
     ],
     tags: ['Headless', 'Next.js', 'Omnichannel', 'GCC Payments'],
     featured: false,
@@ -50,10 +51,10 @@ const caseStudies = [
     category: 'Baby & Kids · Middle East',
     description: 'The #1 destination for mother and baby products in the Middle East. Migrated from legacy platform to Shopify Plus, handling 350K+ products with seamless Arabic/English experience.',
     metrics: [
-      { value: '350K+', label: 'Products', icon: ShoppingBag },
-      { value: '6,500+', label: 'Brands', icon: Star },
-      { value: '20+', label: 'Countries', icon: Users },
-      { value: '2-3', label: 'Day Delivery', icon: TrendingUp },
+      { value: '350K+', labelEn: 'Products',     labelAr: 'منتج',           icon: ShoppingBag },
+      { value: '6,500+', labelEn: 'Brands',      labelAr: 'علامة تجارية',   icon: Star },
+      { value: '20+',   labelEn: 'Countries',    labelAr: 'دولة',            icon: Users },
+      { value: '2-3',   labelEn: 'Day Delivery', labelAr: 'يوم توصيل',      icon: TrendingUp },
     ],
     tags: ['Migration', 'Shopify Plus', 'Multi-currency', 'B2B'],
     featured: false,
@@ -68,10 +69,10 @@ const caseStudies = [
     category: 'Luxury Resale · Dubai',
     description: 'Dubai-based luxury consignment platform with 28K+ unique pieces. Implemented Google Smart Shopping integration and CRO strategies, achieving 45% conversion rate increase.',
     metrics: [
-      { value: '28K+', label: 'Luxury Items', icon: ShoppingBag },
-      { value: '45%', label: 'CVR Increase', icon: TrendingUp },
-      { value: '50%', label: 'Lower CPA', icon: Star },
-      { value: '2x', label: 'Conversions', icon: Users },
+      { value: '28K+', labelEn: 'Luxury Items',  labelAr: 'قطعة فاخرة',     icon: ShoppingBag },
+      { value: '45%',  labelEn: 'CVR Increase',  labelAr: 'زيادة التحويل',   icon: TrendingUp },
+      { value: '50%',  labelEn: 'Lower CPA',     labelAr: 'انخفاض CPA',      icon: Star },
+      { value: '2x',   labelEn: 'Conversions',   labelAr: 'التحويلات',        icon: Users },
     ],
     tags: ['CRO', 'Smart Shopping', 'Luxury UX', 'Analytics'],
     featured: false,
@@ -83,13 +84,14 @@ const caseStudies = [
 ];
 
 const trackRecord = [
-  { value: '180', suffix: '+', label: 'Projects' },
-  { value: '2.8', prefix: '$', suffix: 'B', label: 'Revenue' },
-  { value: '97', suffix: '%', label: 'Retention' },
-  { value: '4', suffix: ' GCC', label: 'Markets' },
+  { value: '180', suffix: '+', labelEn: 'Projects',   labelAr: 'مشروع'       },
+  { value: '2.8', prefix: '$', suffix: 'B', labelEn: 'Revenue',   labelAr: 'إيرادات'     },
+  { value: '97',  suffix: '%', labelEn: 'Retention',  labelAr: 'استبقاء'     },
+  { value: '4',   suffix: ' GCC', labelEn: 'Markets', labelAr: 'أسواق'       },
 ];
 
 export default function Cases() {
+  const { t } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -162,14 +164,14 @@ export default function Cases() {
         {/* Header */}
         <div className="cases-header flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
           <div>
-            <div className="tag mb-4">Selected Work</div>
+            <div className="tag mb-4">{t('Selected Work', 'أعمالنا المختارة')}</div>
             <h2 className="text-[clamp(40px,5vw,66px)] font-[var(--font-display)] font-semibold leading-[0.95]">
-              GCC Brands<br />
-              <span className="text-[var(--accent)]">We've Scaled.</span>
+              {t('GCC Brands', 'علامات خليجية')}<br />
+              <span className="text-[var(--accent)]">{t("We've Scaled.", 'نجحنا في تنميتها.')}</span>
             </h2>
           </div>
           <Link to="/contact" className="btn btn-primary w-fit group">
-            Start Your Project
+            {t('Start Your Project', 'ابدأ مشروعك')}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
@@ -227,7 +229,7 @@ export default function Cases() {
                         {metric.value}
                       </div>
                       <div className="text-[9px] text-[var(--muted)] uppercase tracking-wide mt-1">
-                        {metric.label}
+                        {t(metric.labelEn, metric.labelAr)}
                       </div>
                     </div>
                   </div>
@@ -252,7 +254,7 @@ export default function Cases() {
             
             <div className="relative z-10">
               <div className="text-[10px] font-bold tracking-[0.18em] uppercase text-white/25 mb-6">
-                Our Track Record
+                {t('Our Track Record', 'سجلنا الحافل')}
               </div>
               
               <div className="grid grid-cols-2 gap-5">
@@ -269,7 +271,7 @@ export default function Cases() {
                       <span className="text-[var(--accent)] font-[var(--font-display)] text-[clamp(18px,2vw,28px)] font-bold">{stat.suffix}</span>
                     </div>
                     <div className="text-[10px] text-white/40 mt-1 tracking-wide group-hover:text-white/60 transition-colors">
-                      {stat.label}
+                      {t(stat.labelEn, stat.labelAr)}
                     </div>
                   </div>
                 ))}
@@ -286,7 +288,7 @@ export default function Cases() {
                     </div>
                   ))}
                 </div>
-                <span className="text-[11px] text-white/40">Serving all GCC markets</span>
+                <span className="text-[11px] text-white/40">{t('Serving all GCC markets', 'نخدم جميع أسواق الخليج')}</span>
               </div>
             </div>
           </div>
@@ -333,7 +335,7 @@ export default function Cases() {
                       {metric.value}
                     </div>
                     <div className="text-[8px] text-[var(--muted)] uppercase tracking-wide mt-0.5">
-                      {metric.label}
+                      {t(metric.labelEn, metric.labelAr)}
                     </div>
                   </div>
                 ))}
@@ -388,7 +390,7 @@ export default function Cases() {
                       {metric.value}
                     </div>
                     <div className="text-[8px] text-[var(--muted)] uppercase tracking-wide mt-0.5">
-                      {metric.label}
+                      {t(metric.labelEn, metric.labelAr)}
                     </div>
                   </div>
                 ))}
@@ -443,7 +445,7 @@ export default function Cases() {
                       {metric.value}
                     </div>
                     <div className="text-[8px] text-[var(--muted)] uppercase tracking-wide mt-0.5">
-                      {metric.label}
+                      {t(metric.labelEn, metric.labelAr)}
                     </div>
                   </div>
                 ))}

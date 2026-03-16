@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
+import { useLanguage } from '@/context/LanguageContext';
 
 import Services from '@/sections/Services';
 import ServicesStrip from '@/sections/ServicesStrip';
@@ -8,6 +9,7 @@ import Pricing from '@/sections/Pricing';
 import CTABand from '@/sections/CTABand';
 
 export default function ServicesPage() {
+  const { t } = useLanguage();
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,35 +43,34 @@ export default function ServicesPage() {
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-white/40 text-[12px] font-medium tracking-wider uppercase mb-6">
             <Link to="/" className="hover:text-white/70 transition-colors">
-              Home
+              {t('Home', 'الرئيسية')}
             </Link>
             <span className="opacity-50">/</span>
-            <span className="text-white/60">Services</span>
+            <span className="text-white/60">{t('Services', 'الخدمات')}</span>
           </div>
 
           <div className="page-hero-content max-w-3xl">
-            {/* Tag */}
             <div className="flex items-center gap-2 mb-5">
               <span className="w-4 h-px bg-[var(--accent)]" />
               <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--accent)]">
-                Our Services
+                {t('Our Services', 'خدماتنا')}
               </span>
             </div>
 
-            {/* Heading */}
             <h1
               className="text-[clamp(40px,6vw,80px)] font-bold text-white leading-[0.95] mb-5"
               style={{ fontFamily: 'var(--font-display)' }}
             >
-              Everything Your Store
+              {t('Everything Your Store', 'كل ما يحتاجه متجرك')}
               <br />
-              <span className="gradient-text">Needs to Win.</span>
+              <span className="gradient-text">{t('Needs to Win.', 'للفوز.')}</span>
             </h1>
 
-            {/* Subheading */}
             <p className="text-white/50 text-[17px] leading-relaxed max-w-xl">
-              Four core practices. Twenty-four services. One specialist team —
-              built exclusively for GCC ecommerce.
+              {t(
+                'Four core practices. Twenty-four services. One specialist team — built exclusively for GCC ecommerce.',
+                'أربع ممارسات أساسية. أربع وعشرون خدمة. فريق متخصص واحد — مبني حصراً للتجارة الإلكترونية الخليجية.'
+              )}
             </p>
           </div>
         </div>

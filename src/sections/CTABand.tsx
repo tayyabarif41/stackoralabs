@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, Briefcase } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function CTABand() {
+  const { t } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -48,25 +50,27 @@ export default function CTABand() {
       <div className="container relative z-10">
         <div className="cta-content max-w-[800px]">
           <div className="tag mb-6 !text-white/40 before:!bg-white/30">
-            Ready to Dominate GCC Ecommerce?
+            {t('Ready to Dominate GCC Ecommerce?', 'هل أنت مستعد للهيمنة على التجارة الإلكترونية في الخليج؟')}
           </div>
-          
+
           <h2 className="text-[clamp(44px,6.5vw,88px)] font-[var(--font-display)] font-semibold text-white leading-[0.9] mb-6">
-            Your Competitors Are Already Investing in This.
+            {t('Your Competitors Are Already Investing in This.', 'منافسوك يستثمرون في هذا بالفعل.')}
           </h2>
-          
+
           <p className="text-[16px] lg:text-[17px] text-white/50 leading-relaxed max-w-[480px] mb-10">
-            The GCC ecommerce market grows at 23% annually. The brands that invest in 
-            engineering-grade commerce infrastructure now will own the market in 3 years.
+            {t(
+              'The GCC ecommerce market grows at 23% annually. The brands that invest in engineering-grade commerce infrastructure now will own the market in 3 years.',
+              'ينمو سوق التجارة الإلكترونية في الخليج بنسبة ٢٣٪ سنوياً. ستهيمن العلامات التجارية التي تستثمر الآن في البنية التحتية الاحترافية على السوق في ثلاث سنوات.'
+            )}
           </p>
-          
+
           <div className="flex flex-wrap gap-4">
             <a
               href="#contact"
               onClick={(e) => handleScrollTo(e, '#contact')}
               className="btn btn-accent"
             >
-              Book Free Strategy Session
+              {t('Book Free Strategy Session', 'احجز جلسة استراتيجية مجانية')}
               <ArrowRight className="w-4 h-4" />
             </a>
             <Link
@@ -74,7 +78,7 @@ export default function CTABand() {
               className="btn bg-white/10 text-white border border-white/20 hover:bg-white/20"
             >
               <Briefcase className="w-4 h-4" />
-              See Our Work
+              {t('See Our Work', 'اكتشف أعمالنا')}
             </Link>
           </div>
         </div>

@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function NotFound() {
+  const { t } = useLanguage();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,42 +35,43 @@ export default function NotFound() {
           <div className="flex items-center gap-2 mb-6">
             <span className="w-4 h-px bg-[var(--accent)]" />
             <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--accent)]">
-              404 Error
+              {t('404 Error', 'خطأ ٤٠٤')}
             </span>
           </div>
 
-          {/* Heading */}
           <h1
             className="text-[clamp(64px,12vw,160px)] font-bold text-white leading-none mb-4"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            Oops.
+            {t('Oops.', 'عذراً.')}
           </h1>
 
           <h2
             className="text-[clamp(22px,3vw,36px)] font-bold text-white/80 mb-5 leading-tight"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            Page Not Found
+            {t('Page Not Found', 'الصفحة غير موجودة')}
           </h2>
 
           <p className="text-white/50 text-[17px] leading-relaxed max-w-md mb-10">
-            The page you're looking for doesn't exist or has been moved. Let's get you back on track.
+            {t(
+              "The page you're looking for doesn't exist or has been moved. Let's get you back on track.",
+              'الصفحة التي تبحث عنها غير موجودة أو تم نقلها. دعنا نعيدك إلى المسار الصحيح.'
+            )}
           </p>
 
-          {/* Actions */}
           <div className="flex flex-wrap items-center gap-4">
             <Link
               to="/"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[var(--accent)] text-white text-[14px] font-semibold hover:opacity-90 transition-opacity"
             >
-              ← Back to Home
+              {t('← Back to Home', 'العودة للرئيسية →')}
             </Link>
             <Link
               to="/contact"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/20 text-white/70 text-[14px] font-semibold hover:border-white/40 hover:text-white transition-all"
             >
-              Contact Us
+              {t('Contact Us', 'تواصل معنا')}
             </Link>
           </div>
         </div>
