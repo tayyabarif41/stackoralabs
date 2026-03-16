@@ -281,26 +281,8 @@ export default function Navigation() {
                 {theme === 'dark' ? <Sun className="w-[14px] h-[14px]" /> : <Moon className="w-[14px] h-[14px]" />}
               </button>
 
-              {/* Language — mobile/tablet pill (always visible, compact) */}
-              <div className="lg:hidden flex items-center gap-0.5 p-0.5 rounded-lg bg-[var(--bg-2)] border border-[var(--border)]">
-                {LANGUAGES.map((l) => (
-                  <button
-                    key={l.code}
-                    type="button"
-                    onClick={() => setLang(l.code)}
-                    className={`px-2.5 py-1 rounded-md text-[10px] font-bold transition-all duration-200 ${
-                      lang === l.code
-                        ? 'bg-white text-[var(--accent)] shadow-sm'
-                        : 'text-[var(--muted)] hover:text-[var(--ink)]'
-                    }`}
-                  >
-                    {l.code === 'en' ? 'EN' : 'ع'}
-                  </button>
-                ))}
-              </div>
-
-              {/* Language — desktop dropdown */}
-              <div ref={langDropRef} className="relative hidden lg:block">
+              {/* Language dropdown — all screen sizes */}
+              <div ref={langDropRef} className="relative block">
                 <button
                   type="button"
                   onClick={() => setIsLangOpen((o) => !o)}
